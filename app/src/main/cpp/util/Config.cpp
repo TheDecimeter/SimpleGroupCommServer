@@ -11,7 +11,7 @@
 namespace com_curiousorigins_simplegroupcommserver {
 
     Config::Config() :
-    port(12358), bufferSize(80), longestLoad(30000000), shortestLoad(10000000){
+    port(12351), bufferSize(80), longestLoad(30000000), shortestLoad(10000000){
 
     }
 }

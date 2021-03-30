@@ -9,7 +9,10 @@
 #include "../../ScreenConsole.h"
 
 #include<iterator>
+#include <stdlib.h>
+#include <time.h>
 #include <pthread.h>
+
 
 #define TAG "ClientCreatorCpp"
 #define ST_UNSET 0
@@ -19,6 +22,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
     ClientCreator::ClientCreator(Config * c):
     config(c){
+        srand(static_cast<unsigned int>(time(NULL)));
         for(int i=0; i<3; ++i)
             clients.push_back(new Client(c));
     }
@@ -73,38 +77,53 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         std::vector<pthread_t> onGoingWork;
 
-        clients[2]->stop();
-
-        clients[0]->sendChunk("\x06",1);
-        clients[0]->sendChunk("1ts",3);
-
-        clients[1]->send("2tst1\0",6);
-
-        usleep(500000);
-        clients[0]->sendChunk("t1\0",3);
-
-        clients[1]->send("2tst2\0",6);
-
-        clients[0]->send("1tst2\0",6);
-        clients[0]->send("1tst3\0",6);
-
-        clients[1]->stop();
-
-        //char* data = new char[MAX];
-        //StringTools::fill("R0\x1F""1\x1E""test from 0 to 1\x1D", NULL, MAX);
-        int status = ST_UNSET;
-        onGoingWork.push_back(speak(clients[0],clients[1],"R0\x1F""1\x1E""test from 0 to 1\x1D",status));
+        for(int i=0; i<10000; ++i) {
+            int r = rand() % clients.size();
+            clients[r]->stop();
+            usleep(10000);
+            clients[r]->start();
+        }
+        clients[2]->send("3tst1\0",6);
+        clients[2]->send("3tst2\0",6);
+        clients[2]->send("3tst3\0",6);
+        clients[2]->send("3tst4\0",6);
+        clients[2]->send("3tst5\0",6);
+        clients[2]->send("3tst6\0",6);
+        clients[2]->send("3tst7\0",6);
+        clients[2]->send("3tst8\0",6);
+        clients[2]->send("3tst9\0",6);
 
 
-
-
-
-        std::vector<pthread_t>::iterator ti;
-        for(ti=onGoingWork.begin(); ti!=onGoingWork.end(); ti++)
-            pthread_join(*ti, NULL);
-
-        PDBG(TAG,"finished tests");
-        ScreenConsole::print("finished server tests\n");
+//        clients[0]->sendChunk("\x06",1);
+//        clients[0]->sendChunk("1ts",3);
+//
+//        clients[1]->send("2tst1\0",6);
+//
+//        usleep(500000);
+//        clients[0]->sendChunk("t1\0",3);
+//
+//        clients[1]->send("2tst2\0",6);
+//
+//        clients[0]->send("1tst2\0",6);
+//        clients[0]->send("1tst3\0",6);
+//
+//        clients[1]->stop();
+//
+//        //char* data = new char[MAX];
+//        //StringTools::fill("R0\x1F""1\x1E""test from 0 to 1\x1D", NULL, MAX);
+//        int status = ST_UNSET;
+//        onGoingWork.push_back(speak(clients[0],clients[1],"R0\x1F""1\x1E""test from 0 to 1\x1D",status));
+//
+//
+//
+//
+//
+//        std::vector<pthread_t>::iterator ti;
+//        for(ti=onGoingWork.begin(); ti!=onGoingWork.end(); ti++)
+//            pthread_join(*ti, NULL);
+//
+//        PDBG(TAG,"finished tests");
+//        ScreenConsole::print("finished server tests\n");
     }
 
     void *ClientCreator::speak_work(void *speakData) {

@@ -32,12 +32,17 @@ namespace com_curiousorigins_simplegroupcommserver {
             return;
         }
         if(msg.size() > 0) {
-            printLockRef->lock();
-
+            std::string buf;
             std::vector<std::string>::iterator i;
             for (i = msg.begin(); i != msg.end(); i++)
-                messageRef->push_back(*i);
+                buf+=(*i);
 
+            printLockRef->lock();
+
+//            std::vector<std::string>::iterator i;
+//            for (i = msg.begin(); i != msg.end(); i++)
+//                messageRef->push_back(*i);
+            messageRef->push_back(buf);
             msg.clear();
             printLockRef->unlock();
         }
@@ -52,8 +57,8 @@ namespace com_curiousorigins_simplegroupcommserver {
         ScreenConsole::messageRef=NULL;
     }
 
-    ScreenConsole::ScreenConsole(useconds_t sleepTime, useconds_t updateTime, JavaVM *vm, JNIEnv *env, jobject * obj) {
-        this->sleepTime=sleepTime;
+    ScreenConsole::ScreenConsole(useconds_t sleepTime, useconds_t updateTime, JavaVM *vm, JNIEnv *env, jobject * obj):
+    sleepTime(sleepTime), updateTime(updateTime){
         listen=true;
         PDBG(TAG,"starting screen console");
         packet=new Packet(vm,obj);
@@ -89,13 +94,15 @@ namespace com_curiousorigins_simplegroupcommserver {
                 printLock.lock();
 
                 std::vector<std::string>::iterator i;
-                for (i = messages.begin(); i != messages.end(); i++)
-                    env->CallVoidMethod(packet->inst, methodID, env->NewStringUTF((*i).c_str()));
+                for (i = messages.begin(); i != messages.end(); i++) {
+                    jstring s = env->NewStringUTF((*i).c_str());
+                    env->CallVoidMethod(packet->inst, methodID, s);
+                    env->DeleteLocalRef(s);
+                }
 
                 messages.clear();
                 printLock.unlock();
             }
-
             usleep(updateTime);
         }
 

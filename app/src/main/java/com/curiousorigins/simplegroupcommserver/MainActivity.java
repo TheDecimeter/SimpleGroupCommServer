@@ -9,12 +9,14 @@ import com.curiousorigins.simplegroupcommserver.network.client.ClientCreator;
 import com.curiousorigins.simplegroupcommserver.network.client.ClientTCP;
 import com.curiousorigins.simplegroupcommserver.network.server.ServerTCP;
 
+import java.util.LinkedList;
+
 
 public class MainActivity extends Activity {
 
     private ServerTCP server;
     private ClientCreator.Bundle c1;
-    StringBuilder screenPrintConsole=new StringBuilder();
+    private LinkedList<String> screenPrintMessages = new LinkedList<>();
     TextView console;
 
     // Used to load the 'native-lib' library on application startup.
@@ -45,10 +47,27 @@ public class MainActivity extends Activity {
     }
 
     public void nativePrint(String msg){
-        screenPrintConsole.append(msg);
-        if(screenPrintConsole.length() > 4096){
-            screenPrintConsole.delete(0,screenPrintConsole.length()-4096);
+        //add message to end of list
+        String[] ts = msg.split("\n");
+        for (String t : ts) {
+            if (t.length() > 0) {
+                screenPrintMessages.addLast(t);
+            }
         }
+
+
+        //remove old messages if they go over
+        while(screenPrintMessages.size() > 10)
+            screenPrintMessages.removeFirst();
+
+        final StringBuilder screenPrintConsole = new StringBuilder();
+
+        for(String line : screenPrintMessages)
+            screenPrintConsole.append(line).append("\n");
+
+//        if(screenPrintConsole.length() > 4096){
+//            screenPrintConsole.delete(0,screenPrintConsole.length()-4096);
+//        }
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
