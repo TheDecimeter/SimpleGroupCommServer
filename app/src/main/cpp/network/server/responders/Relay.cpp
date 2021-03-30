@@ -6,7 +6,7 @@
 namespace com_curiousorigins_simplegroupcommserver {
 
     Relay::Relay(const char *data, const unsigned char dataLen):
-    msgLen(dataLen), dataLen(dataLen), data(data){
+    msgLen(dataLen), dataLen(dataLen), data(data), tst(NULL){
 
     }
 

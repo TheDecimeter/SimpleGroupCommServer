@@ -3,7 +3,6 @@
 //
 
 #include "ClientProcessor.h"
-#include "ServerTCP.h"
 #include "../../debug.h"
 #include "../../ScreenConsole.h"
 
@@ -28,8 +27,8 @@
 namespace com_curiousorigins_simplegroupcommserver {
 
 
-    ClientProcessor::ClientProcessor(const Config *c, int socketID, struct sockaddr * connectionInfo, ServerTCP * server, ClientHandler * handler, int id):
-    server(server), handler(handler), socketID(socketID), state(ST_READ_LEN), bufLen(4), id(id), responder(server, this){ //TODO change bufLen to be a respectable size
+    ClientProcessor::ClientProcessor(const Config *c, int socketID, struct sockaddr * connectionInfo, int id):
+    socketID(socketID), state(ST_READ_LEN), bufLen(4), id(id), responder(){ //TODO change bufLen to be a respectable size
         setClientAddr(connectionInfo);
         PDBGF(TAG,"connection from %s",clientAddr);
         ScreenConsole::print({"Svr cnnt to: ",clientAddr,"\n"});

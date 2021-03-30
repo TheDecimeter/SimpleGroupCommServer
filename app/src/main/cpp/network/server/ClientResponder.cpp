@@ -7,8 +7,7 @@
 
 namespace com_curiousorigins_simplegroupcommserver {
 
-    ClientResponder::ClientResponder(ServerTCP *server, ClientProcessor * owner) :
-    server(server), owner(owner){
+    ClientResponder::ClientResponder(){
 
     }
     /**

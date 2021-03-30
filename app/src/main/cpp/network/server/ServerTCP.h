@@ -12,7 +12,6 @@
 #include "../../util/Config.h"
 
 namespace com_curiousorigins_simplegroupcommserver {
-    class ClientHandler;
 
     class ServerTCP {
     private:
@@ -35,8 +34,6 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         void start();
         void stop();
-
-        bool isCurrent(ClientHandler * handler);
     };
 }
 

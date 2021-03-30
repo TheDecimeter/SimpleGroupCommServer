@@ -7,17 +7,13 @@
 
 
 #include <unordered_map>
-#include <netinet/in.h>
 #include <vector>
-#include<mutex>
+#include <mutex>
 
-#include "ServerTCP.h"
 #include "../../util/Config.h"
 #include "ClientProcessor.h"
 
 namespace com_curiousorigins_simplegroupcommserver {
-    class ServerTCP;
-    class ClientProcessor;
 
     class ClientHandler {
     private:
@@ -25,15 +21,16 @@ namespace com_curiousorigins_simplegroupcommserver {
         pthread_t handlerThread;
         bool listen=false;
         int id;
+        ClientHandler *const active;
         std::unordered_map<int, ClientProcessor*> processors;
         std::mutex processorListLock;
 
+        ClientHandler(const Config * c, int id, ClientHandler *const active);
         static void *clientWorkWrapper(void *thiz);
         void clientWork();
 
-        ServerTCP * server;
     public:
-        ClientHandler(const Config * c, ServerTCP * server, int id);
+        ClientHandler(const Config * c, int id);
         ~ClientHandler();
         void addProcessor(struct sockaddr * connectionInfo, int connfd, int clientID);
         void merge(ClientHandler * other);

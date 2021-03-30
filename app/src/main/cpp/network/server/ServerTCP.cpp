@@ -28,7 +28,7 @@ namespace com_curiousorigins_simplegroupcommserver{
     config(c){
 //        PDBG(TAG,"created server")
         stopFlag = true;
-        current=new ClientHandler(c,this, handlerCount++);
+        current=new ClientHandler(c, handlerCount++);
         this->afterCreated=afterCreated;
 //        clients = new std::unordered_map<int,ClientHandler*>;
     }
@@ -186,10 +186,6 @@ namespace com_curiousorigins_simplegroupcommserver{
 //            clients= nullptr;
 
 
-    }
-
-    bool ServerTCP::isCurrent(ClientHandler *handler) {
-        return handler->key()==current->key();
     }
 
 }

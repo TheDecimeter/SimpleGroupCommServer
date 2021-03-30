@@ -4,20 +4,10 @@
 
 
 #include "ClientHandler.h"
-#include "ServerTCP.h"
 #include "../../debug.h"
 #include "../../ScreenConsole.h"
 
 
-#include <arpa/inet.h>
-#include <stdio.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <linux/in6.h>
-#include <stdlib.h>
-#include <string>
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include <chrono>
@@ -28,6 +18,35 @@
 #define TAG "      clientHandlerSERVcpp"
 
 namespace com_curiousorigins_simplegroupcommserver {
+
+    /**
+     * Constructor for creating active client handler
+     *  (the client handler created by the server from which all other client handlers
+     *   split)
+     * @param c - config file settings
+     * @param id - the starting id of a client hanlder (unused)
+     */
+    ClientHandler::ClientHandler(const Config * c, int id):
+            config(c), id(id), active(this){}
+
+    /**
+     * Constructor for creating a new client handler which is not actively taking new connections
+     * from the server. This is used as a fork from the active client handler
+     * @param c - config file settings
+     * @param id - the id for this client handler (unused)
+     * @param active - the active client handler
+     */
+    ClientHandler::ClientHandler(const Config *c, int id, ClientHandler *const active):
+            config(c), id(id), active(active){}
+
+
+    ClientHandler::~ClientHandler(){
+        listen=false;
+        std::unordered_map<int,ClientProcessor*>::iterator processor;
+        for(processor=processors.begin(); processor!=processors.end(); processor++) {
+            delete processor->second;
+        }
+    }
 
     void *ClientHandler::clientWorkWrapper(void *thiz) {
         ClientHandler* client = (ClientHandler*) thiz;
@@ -72,7 +91,7 @@ namespace com_curiousorigins_simplegroupcommserver {
                     PDBG(TAG, "long process time, need to split");
                 }
                 else {
-                    if (dur < shortestLoad && !server->isCurrent(this)) {
+                    if (dur < shortestLoad && this != active) {
                         PDBG(TAG, "workload too light, need to merge");
                     }
 
@@ -90,28 +109,14 @@ namespace com_curiousorigins_simplegroupcommserver {
         return;
     }
 
-    ClientHandler::ClientHandler(const Config * c, ServerTCP * server, int id):
-    config(c), id(id), server(server){
 
-    }
-
-    ClientHandler::~ClientHandler(){
-        listen=false;
-        std::unordered_map<int,ClientProcessor*>::iterator processor;
-        for(processor=processors.begin(); processor!=processors.end(); processor++) {
-            delete processor->second;
-        }
-//        close(socketID);
-
-//        delete clientAddr;
-    }
 
 
 
 
     void ClientHandler::addProcessor(struct sockaddr *connectionInfo, int connfd, int clientID) {
 
-        ClientProcessor * p = new ClientProcessor(config, connfd, connectionInfo, server, this, clientID);
+        ClientProcessor * p = new ClientProcessor(config, connfd, connectionInfo, clientID);
 
         processorListLock.lock();
         if(processors.find(p->key()) == processors.end())
@@ -140,7 +145,7 @@ namespace com_curiousorigins_simplegroupcommserver {
     void ClientHandler::merge(ClientHandler * other) {
         if(other == this)
             return;
-        if(server->isCurrent(other)){
+        if(other == active){
             PDBG(TAG, "\n\nERROR, can't merge currently active client handler into another handler. That would remove the currently active handler (you can merge other handlers into the currently active one though)\n\n")
             return;
         }
@@ -169,6 +174,7 @@ namespace com_curiousorigins_simplegroupcommserver {
             PDBG(TAG,"listening thread already started");
         }
     }
+
 
 
 }

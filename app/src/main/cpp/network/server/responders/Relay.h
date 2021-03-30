@@ -11,7 +11,7 @@ namespace com_curiousorigins_simplegroupcommserver {
     class Relay : public Runnable {
     private:
         const char * data;
-        const char const * tst;
+        const char * const tst;
         const unsigned char msgLen;
         unsigned char dataLen;
 

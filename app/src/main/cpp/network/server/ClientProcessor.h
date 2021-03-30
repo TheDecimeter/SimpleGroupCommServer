@@ -13,9 +13,6 @@
 #define PROCESS_CLOSE_REQUEST 0
 
 namespace com_curiousorigins_simplegroupcommserver {
-    class ServerTCP;
-    class ClientHandler;
-    class ClientResponder;
 
     class ClientProcessor {
 
@@ -28,8 +25,6 @@ namespace com_curiousorigins_simplegroupcommserver {
         // dataLen, total length of data
         unsigned char bufLen, dataLen, bytesToRead, state;
         int socketID, id;
-        ServerTCP * server;
-        ClientHandler * handler;
         ClientResponder responder;
         void setClientAddr(struct sockaddr * connectionInfo);
         ssize_t processLen();
@@ -38,7 +33,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         void terminate();
 
     public:
-        ClientProcessor(const Config * c, int socketID, struct sockaddr * connectionInfo, ServerTCP * server, ClientHandler * handler, int id);
+        ClientProcessor(const Config * c, int socketID, struct sockaddr * connectionInfo, int id);
         ~ClientProcessor();
         ssize_t process();
         int key();
