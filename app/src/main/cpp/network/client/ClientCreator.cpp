@@ -22,8 +22,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
     ClientCreator::ClientCreator(Config * c):
     config(c){
-        srand(static_cast<unsigned int>(time(NULL)));
-        for(int i=0; i<3; ++i)
+        for(int i=0; i<20; ++i)
             clients.push_back(new Client(c));
     }
 
@@ -77,10 +76,10 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         std::vector<pthread_t> onGoingWork;
 
-        for(int i=0; i<10000; ++i) {
+        for(int i=0; i<10; ++i) {
             int r = rand() % clients.size();
             clients[r]->stop();
-            usleep(10000);
+            //usleep(10000);
             clients[r]->start();
         }
         clients[2]->send("3tst1\0",6);

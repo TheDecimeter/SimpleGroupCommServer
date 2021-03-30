@@ -30,7 +30,7 @@ namespace com_curiousorigins_simplegroupcommserver {
     ClientProcessor::ClientProcessor(const Config *c, int socketID, struct sockaddr * connectionInfo, int id):
     socketID(socketID), state(ST_READ_LEN), bufLen(4), id(id), responder(){ //TODO change bufLen to be a respectable size
         setClientAddr(connectionInfo);
-        PDBGF(TAG,"connection from %s",clientAddr);
+        PDBG(TAG,"connection from %s",clientAddr);
         ScreenConsole::print({"Svr cnnt to: ",clientAddr,"\n"});
 
         fcntl(socketID, F_SETFL, O_NONBLOCK);
@@ -79,13 +79,13 @@ namespace com_curiousorigins_simplegroupcommserver {
             if(errno == EWOULDBLOCK || errno == EAGAIN){
                 return -1;
             }
-            PDBGF(TAG," failed to read %d", errno);
+            PDBG(TAG," failed to read %d", errno);
             return -1;
         }
 
         dataLen=len; //increase length size by one to compensate for message type byte
         bytesToRead=dataLen;
-        PDBGF(TAG, "need to read of length %d", len);
+        PDBG(TAG, "need to read of length %d", len);
 
         if(bufLen < dataLen){
             delete buf;
@@ -111,7 +111,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
             return dataLen;
         }else if(bytesRead>0){ //need to read more
-            PDBGF(TAG, "Server rcv partial: %s", ScreenConsole::s(readerPos,bytesRead).c_str())
+            PDBG(TAG, "Server rcv partial: %s", ScreenConsole::s(readerPos,bytesRead).c_str())
             bytesToRead -= bytesRead;
             readerPos += bytesRead;
             return bytesRead;
@@ -122,7 +122,7 @@ namespace com_curiousorigins_simplegroupcommserver {
             if(errno == EWOULDBLOCK || errno == EAGAIN){
                 return -1;
             }
-            PDBGF(TAG, " failed to read %d", errno);
+            PDBG(TAG, " failed to read %d", errno);
             if(errno == EINTR)
                 return -2;
             return -1;

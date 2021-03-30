@@ -1,14 +1,16 @@
 
-
-#include <jni.h>
-#include <pthread.h>
-#include "debug.h"
-#include <string>
-#include <unistd.h>
 #include "Tests.h"
 #include "network/server/ServerTCP.h"
 #include "util/Config.h"
 #include "ScreenConsole.h"
+#include "debug.h"
+
+#include <jni.h>
+#include <pthread.h>
+#include <string>
+#include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
 
 
 #define TAG "MainCpp"
@@ -64,6 +66,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
     static void createNative(JNIEnv *env, jobject thiz){
         PDBG(TAG, "starting native methods")
+        srand(time(NULL));
         //env->GetJavaVM(&jvm);
        // ScreenConsole::bind(jvm,env);
 

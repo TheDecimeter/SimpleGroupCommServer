@@ -17,7 +17,7 @@ namespace com_curiousorigins_simplegroupcommserver {
     private:
         const Config * config;
         ClientCreator * afterCreated;
-        int clientCount=0, handlerCount=0;
+        unsigned int clientCount=0, handlerCount=0;
         bool stopFlag = false;
         int serverSocketID;
         pthread_t serverThread;

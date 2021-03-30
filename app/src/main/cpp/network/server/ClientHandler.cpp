@@ -24,20 +24,18 @@ namespace com_curiousorigins_simplegroupcommserver {
      *  (the client handler created by the server from which all other client handlers
      *   split)
      * @param c - config file settings
-     * @param id - the starting id of a client hanlder (unused)
      */
-    ClientHandler::ClientHandler(const Config * c, int id):
-            config(c), id(id), active(this){}
+    ClientHandler::ClientHandler(const Config * c):
+            config(c), active(this){}
 
     /**
      * Constructor for creating a new client handler which is not actively taking new connections
      * from the server. This is used as a fork from the active client handler
      * @param c - config file settings
-     * @param id - the id for this client handler (unused)
      * @param active - the active client handler
      */
-    ClientHandler::ClientHandler(const Config *c, int id, ClientHandler *const active):
-            config(c), id(id), active(active){}
+    ClientHandler::ClientHandler(const Config *c, ClientHandler *const active):
+            config(c), active(active){}
 
 
     ClientHandler::~ClientHandler(){
@@ -85,7 +83,6 @@ namespace com_curiousorigins_simplegroupcommserver {
             //see if this thread is over or under worked
             // and sleep it for a period to keep processor from being needlessly overworked
             long dur = end.tv_nsec-start.tv_nsec;
-//            PDBGF(TAG,"gap time %d", dur);
             if(dur > 0){
                 if(dur > longestLoad && processors.size() > 1){
                     PDBG(TAG, "long process time, need to split");
@@ -136,10 +133,6 @@ namespace com_curiousorigins_simplegroupcommserver {
         else{
             PDBG(TAG,"listening thread already started");
         }
-    }
-
-    int ClientHandler::key() {
-        return id;
     }
 
     void ClientHandler::merge(ClientHandler * other) {

@@ -8,19 +8,15 @@
 #ifdef DEBUG
 #include <android/log.h>
     #define PDBG(TAG, args...) __android_log_print(ANDROID_LOG_DEBUG, TAG, args);
-    #define PDBGF(TAG,MSG,ARG) __android_log_print(ANDROID_LOG_DEBUG,TAG,MSG,ARG);
 #else
-    #define PDBG(TAG,MSG)
-    #define PDBGF(TAG,MSG,ARG)
+    #define PDBG(TAG,args...)
 #endif
 
 #ifdef PRINT
 #include <android/log.h>
-    #define PPRNT(TAG,MSG) __android_log_print(ANDROID_LOG_INFO,TAG,MSG);
-    #define PPRNTF(TAG,MSG,ARG) __android_log_print(ANDROID_LOG_INFO,TAG,MSG,ARG);
+    #define PPRNT(TAG,args...) __android_log_print(ANDROID_LOG_INFO,TAG, args);
 #else
-    #define PPRNT(TAG,MSG)
-    #define PPRNTF(TAG,MSG,ARG)
+    #define PPRNT(TAG,args...)
 #endif
 
 #endif //SIMPLEGROUPCOMMSERVER_DEBUG_H

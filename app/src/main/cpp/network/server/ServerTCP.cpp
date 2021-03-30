@@ -28,7 +28,7 @@ namespace com_curiousorigins_simplegroupcommserver{
     config(c){
 //        PDBG(TAG,"created server")
         stopFlag = true;
-        current=new ClientHandler(c, handlerCount++);
+        current=new ClientHandler(c);
         this->afterCreated=afterCreated;
 //        clients = new std::unordered_map<int,ClientHandler*>;
     }
@@ -52,7 +52,7 @@ namespace com_curiousorigins_simplegroupcommserver{
 //            PDBG(TAG,"closed correctly")
 //        }
 //        else{
-//            PDBGF(TAG,"failed to close server %d", errno);
+//            PDBG(TAG,"failed to close server %d", errno);
 //        }
     }
 
@@ -120,28 +120,7 @@ namespace com_curiousorigins_simplegroupcommserver{
             // Accept the data packet from client and verification
             connfd = accept(serverSocketID, &clientAddr, &len);
             if (connfd < 0) {
-                PDBGF(TAG, "server acccept failed %d", errno);
-//                switch(errno){
-//                    case EFAULT:
-//                        PDBG(TAG, "server accept fault\n")
-//                        break;
-//                    case ECONNABORTED:
-//                        PDBG(TAG, "server accept aborted...\n")
-//                        break;
-//                    case EINTR:
-//                        PDBG(TAG, "server accept aborted\n")
-//                        break;
-//                    case ENOTSOCK:
-//                        PDBG(TAG, "server accept aborted, no valid socket\n")
-//                        break;
-//                    case EOPNOTSUPP:
-//                        PDBG(TAG, "server accept aborted, wrong type of socket\n")
-//                        break;
-//                    case EBADF:
-//                        PDBG(TAG, "server accept aborted, socket not open\n")
-//                        stop();
-//                        break;
-//                }
+                PDBG(TAG, "server acccept failed %d", errno);
 
                 switch(errno) {
                     case EBADF:
@@ -158,8 +137,6 @@ namespace com_curiousorigins_simplegroupcommserver{
             } else {
                 PDBG(TAG, "server acccept the client...\n")
                 current->addProcessor(&clientAddr, connfd, clientCount++);
-//                ClientHandler * c = new ClientHandler(config, &clientAddr, connfd, entityCount++,this);
-//                (*clients)[c->key()] = c;
 
             }
         }
@@ -174,7 +151,7 @@ namespace com_curiousorigins_simplegroupcommserver{
             PDBG(TAG,"closed correctly")
         }
         else{
-            PDBGF(TAG,"failed to close server %d", errno);
+            PDBG(TAG,"failed to close server %d", errno);
         }
 
         for(std::unordered_map<int,ClientHandler*>::iterator it = clientHandlers.begin(); it != clientHandlers.end(); it++){

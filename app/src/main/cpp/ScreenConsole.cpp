@@ -17,7 +17,7 @@ namespace com_curiousorigins_simplegroupcommserver {
             PDBG(TAG,"not adding item to print to screen, null pointer")
             return;
         }
-        //PDBGF(TAG,"adding element to print que %s",msg.c_str())
+        //PDBG(TAG,"adding element to print que %s",msg.c_str())
         printLockRef->lock();
 
         messageRef->push_back(msg);

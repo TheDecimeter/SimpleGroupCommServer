@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
 
 
         //remove old messages if they go over
-        while(screenPrintMessages.size() > 10)
+        while(screenPrintMessages.size() > 34)
             screenPrintMessages.removeFirst();
 
         final StringBuilder screenPrintConsole = new StringBuilder();
