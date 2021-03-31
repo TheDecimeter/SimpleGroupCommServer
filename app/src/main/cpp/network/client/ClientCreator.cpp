@@ -2,6 +2,8 @@
 // Created by dawnoftherent on 3/20/21.
 //
 
+#include "../server/storage/ClientInfo.h"
+
 #include "ClientCreator.h"
 #include "../../debug.h"
 #include "Client.h"
@@ -75,7 +77,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         //TODO send data tests
 
         std::vector<pthread_t> onGoingWork;
-
+//
         for(int i=0; i<10; ++i) {
             int r = rand() % clients.size();
             clients[r]->stop();
@@ -123,6 +125,14 @@ namespace com_curiousorigins_simplegroupcommserver {
 //
 //        PDBG(TAG,"finished tests");
 //        ScreenConsole::print("finished server tests\n");
+
+
+
+
+//        ClientInfo * spot = new ClientInfo();
+//        ClientInfo * info = new(spot) ClientInfo(1,1);
+//        delete info;
+
     }
 
     void *ClientCreator::speak_work(void *speakData) {

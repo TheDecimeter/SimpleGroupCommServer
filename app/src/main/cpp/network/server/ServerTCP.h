@@ -7,6 +7,7 @@
 
 #include<pthread.h>
 #include "ClientHandler.h"
+#include "storage/ClientManager.h"
 #include "../client/ClientCreator.h"
 #include <unordered_map>
 #include "../../util/Config.h"
@@ -17,7 +18,8 @@ namespace com_curiousorigins_simplegroupcommserver {
     private:
         const Config * config;
         ClientCreator * afterCreated;
-        unsigned int clientCount=0, handlerCount=0;
+        unsigned int clientCount=0;
+        ClientManager allClients;
         bool stopFlag = false;
         int serverSocketID;
         pthread_t serverThread;

@@ -18,9 +18,13 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
             native-lib.cpp ScreenConsole.cpp Tests.cpp
+
             util/StringTools.cpp util/Config.cpp
+
             network/server/ServerTCP.cpp network/server/ClientHandler.cpp network/server/ClientProcessor.cpp network/server/ClientResponder.cpp
+            network/server/storage/ClientInfo.cpp network/server/storage/ClientManager.cpp
             network/server/responders/Relay.cpp
+
             network/client/Client.cpp network/client/ClientCreator.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
