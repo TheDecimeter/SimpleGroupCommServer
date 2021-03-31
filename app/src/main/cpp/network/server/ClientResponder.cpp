@@ -7,7 +7,8 @@
 
 namespace com_curiousorigins_simplegroupcommserver {
 
-    ClientResponder::ClientResponder(){
+    ClientResponder::ClientResponder(ClientManager * allClients):
+    allClients(allClients){
 
     }
     /**

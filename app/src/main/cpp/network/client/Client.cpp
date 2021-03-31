@@ -86,7 +86,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
             ssize_t bytesL = write(socketID, &dataLen, 1);
             if(bytesL <= 0){
-                PDBG(TAG,"failed to send all %d", bytesL);
+                PDBG(TAG,"failed to send all %d", errno);
             }
 //            else{
 //                PDBGF(TAG,"Client sent Size: %d", bytesL);
@@ -112,7 +112,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
             ssize_t bytes = write(socketID, data, dataLen);
             if(bytes <= 0){
-                PDBG(TAG,"failed to send all %d", bytes);
+                PDBG(TAG,"failed to send all %d", errno);
             }
 //            else{
 //                PDBGF(TAG,"Client sent Size: %d", bytes);

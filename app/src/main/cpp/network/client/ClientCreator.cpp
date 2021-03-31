@@ -78,7 +78,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         std::vector<pthread_t> onGoingWork;
 //
-        for(int i=0; i<10; ++i) {
+        for(int i=0; i<100000; ++i) {
             int r = rand() % clients.size();
             clients[r]->stop();
             //usleep(10000);
@@ -132,6 +132,16 @@ namespace com_curiousorigins_simplegroupcommserver {
 //        ClientInfo * spot = new ClientInfo();
 //        ClientInfo * info = new(spot) ClientInfo(1,1);
 //        delete info;
+
+
+//int x=4;
+//PDBG(TAG, "x init: %d", x);
+//int &y = x;
+//int z=6;
+//y=z;
+//        PDBG(TAG, "x after y=z=6: %d", x);
+//        z++;
+//        PDBG(TAG, "x after z++: %d", x);
 
     }
 

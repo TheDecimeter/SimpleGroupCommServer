@@ -22,14 +22,20 @@ namespace com_curiousorigins_simplegroupcommserver {
     /**
      * add a client to the manager
      * @param socketID - the client's socket id
+     * @param outID - the new ID of the client (only valid if true is returned)
      * @return true if the client was successfully added
      */
-    bool ClientManager::add(int socketID) {
+    bool ClientManager::add(int socketID, uint32_t &outID) {
         ClientInfo * infoSpot = new ClientInfo;
+//        PDBG(TAG, "before lock")
         lock.lock();
+//        PDBG(TAG, "after lock")
         if(next()){
+//            PDBG(TAG, "after next")
             ClientInfo * info = new(infoSpot) ClientInfo(clientCounter, socketID);
             clients.insert(std::pair<int, ClientInfo*>(clientCounter, info));
+            outID=clientCounter;
+            lock.unlock();
             return true;
         }
         lock.unlock();
@@ -45,18 +51,19 @@ namespace com_curiousorigins_simplegroupcommserver {
      */
     bool ClientManager::next() {
         clientCounter++;
-        std::unordered_map<int, ClientInfo*>::iterator it;
+        std::unordered_map<uint32_t, ClientInfo*>::iterator it;
         it = clients.find(clientCounter);
 
-        if(it != clients.end())
+        if(it == clients.end())
             return true;
 
         if(clients.size() * 2 >= UINT32_MAX) {
             PDBG(TAG, "too many clients to create more %d", clients.size())
             return false;
         }
-        while(it == clients.end()) {
-            clientCounter = clientCounter = static_cast<unsigned int>(rand() + rand());
+        while(it != clients.end()) {
+//            PDBG(TAG, "trying %d", clientCounter)
+            clientCounter = clientCounter = static_cast<uint32_t>(rand() + rand());
             it = clients.find(clientCounter);
         }
         return true;
@@ -68,7 +75,7 @@ namespace com_curiousorigins_simplegroupcommserver {
      */
     void ClientManager::remove(uint32_t id) {
         lock.lock();
-        std::unordered_map<int, ClientInfo*>::iterator it;
+        std::unordered_map<uint32_t, ClientInfo*>::iterator it;
         it = clients.find(id);
         if(it != clients.end()) {
             clients.erase(it);
@@ -80,7 +87,7 @@ namespace com_curiousorigins_simplegroupcommserver {
     bool ClientManager::tryGet(uint32_t id, ClientInfo * out){
         bool r=false;
         lock.lock_shared();
-        std::unordered_map<int,ClientInfo*>::iterator it = clients.find(id);
+        std::unordered_map<uint32_t,ClientInfo*>::iterator it = clients.find(id);
         if(it != clients.end()){
             r=true;
             out = it->second;
@@ -92,7 +99,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
     bool ClientManager::contains(uint32_t id) {
         lock.lock_shared();
-        std::unordered_map<int,ClientInfo*>::iterator it = clients.find(id);
+        std::unordered_map<uint32_t,ClientInfo*>::iterator it = clients.find(id);
         lock.unlock_shared();
 
         return it == clients.end();

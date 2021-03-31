@@ -27,8 +27,8 @@
 namespace com_curiousorigins_simplegroupcommserver {
 
 
-    ClientProcessor::ClientProcessor(const Config *c, int socketID, struct sockaddr * connectionInfo, int id):
-    socketID(socketID), state(ST_READ_LEN), bufLen(4), id(id), responder(){ //TODO change bufLen to be a respectable size
+    ClientProcessor::ClientProcessor(const Config *c, int socketID, struct sockaddr * connectionInfo, uint32_t id, ClientManager * allClients):
+    socketID(socketID), state(ST_READ_LEN), bufLen(4), id(id), allClients(allClients), responder(allClients){ //TODO change bufLen to be a respectable size
         setClientAddr(connectionInfo);
         PDBG(TAG,"connection from %s",clientAddr);
         ScreenConsole::print({"Svr cnnt to: ",clientAddr,"\n"});
@@ -161,10 +161,10 @@ namespace com_curiousorigins_simplegroupcommserver {
     }
 
     void ClientProcessor::terminate() {
-        PDBG(TAG,"%d received close message", id)
+//        PDBG(TAG,"%d received close message", id)
     }
 
-    int ClientProcessor::key() {
+    uint32_t ClientProcessor::key() {
         return id;
     }
 

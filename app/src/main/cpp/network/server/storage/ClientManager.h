@@ -13,14 +13,14 @@ namespace com_curiousorigins_simplegroupcommserver {
     class ClientManager {
     private:
         uint32_t clientCounter=0;
-        std::unordered_map<int, ClientInfo*> clients;
+        std::unordered_map<uint32_t, ClientInfo*> clients;
         std::shared_timed_mutex lock;
         bool next();
 
     public:
         ClientManager();
         ~ClientManager();
-        bool add(int socketID);
+        bool add(int socketID, uint32_t &outID);
         void remove(uint32_t id);
         bool contains(uint32_t id);
         bool tryGet(uint32_t id, ClientInfo * out);

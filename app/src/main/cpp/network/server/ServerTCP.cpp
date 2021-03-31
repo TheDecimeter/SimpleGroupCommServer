@@ -28,7 +28,7 @@ namespace com_curiousorigins_simplegroupcommserver{
     config(c){
 //        PDBG(TAG,"created server")
         stopFlag = true;
-        current=new ClientHandler(c);
+        current=new ClientHandler(c, &allClients);
         this->afterCreated=afterCreated;
 //        clients = new std::unordered_map<int,ClientHandler*>;
     }
@@ -136,7 +136,7 @@ namespace com_curiousorigins_simplegroupcommserver{
                 }
             } else {
                 PDBG(TAG, "server acccept the client...\n")
-                current->addProcessor(&clientAddr, connfd, clientCount++);
+                current->addProcessor(&clientAddr, connfd);
 
             }
         }

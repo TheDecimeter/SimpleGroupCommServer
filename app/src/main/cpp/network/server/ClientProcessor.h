@@ -7,6 +7,7 @@
 
 #include "../../util/Config.h"
 #include "ClientResponder.h"
+#include "storage/ClientManager.h"
 
 #include <netinet/in.h>
 
@@ -24,8 +25,10 @@ namespace com_curiousorigins_simplegroupcommserver {
         // bytesToRead - bytes left in stream (<= dataLen),
         // dataLen, total length of data
         unsigned char bufLen, dataLen, bytesToRead, state;
-        int socketID, id;
+        int socketID;
+        uint32_t id;
         ClientResponder responder;
+        ClientManager * allClients;
         void setClientAddr(struct sockaddr * connectionInfo);
         ssize_t processLen();
         ssize_t processData();
@@ -33,10 +36,10 @@ namespace com_curiousorigins_simplegroupcommserver {
         void terminate();
 
     public:
-        ClientProcessor(const Config * c, int socketID, struct sockaddr * connectionInfo, int id);
+        ClientProcessor(const Config * c, int socketID, struct sockaddr * connectionInfo, uint32_t id, ClientManager * allClients);
         ~ClientProcessor();
         ssize_t process();
-        int key();
+        uint32_t key();
     };
 }
 

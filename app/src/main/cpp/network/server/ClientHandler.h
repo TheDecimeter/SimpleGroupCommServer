@@ -23,15 +23,16 @@ namespace com_curiousorigins_simplegroupcommserver {
         ClientHandler *const active;
         std::unordered_map<int, ClientProcessor*> processors;
         std::mutex processorListLock;
+        ClientManager * allClients;
 
-        ClientHandler(const Config * c, ClientHandler *const active);
+        ClientHandler(const Config * c, ClientHandler *const active, ClientManager * allClients);
         static void *clientWorkWrapper(void *thiz);
         void clientWork();
 
     public:
-        ClientHandler(const Config * c);
+        ClientHandler(const Config * c, ClientManager * allClients);
         ~ClientHandler();
-        void addProcessor(struct sockaddr * connectionInfo, int connfd, int clientID);
+        void addProcessor(struct sockaddr * connectionInfo, int connfd);
         void merge(ClientHandler * other);
     };
 }

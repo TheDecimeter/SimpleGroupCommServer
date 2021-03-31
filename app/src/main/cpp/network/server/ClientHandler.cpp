@@ -25,8 +25,8 @@ namespace com_curiousorigins_simplegroupcommserver {
      *   split)
      * @param c - config file settings
      */
-    ClientHandler::ClientHandler(const Config * c):
-            config(c), active(this){}
+    ClientHandler::ClientHandler(const Config * c,ClientManager * allClients):
+            config(c), active(this), allClients(allClients){}
 
     /**
      * Constructor for creating a new client handler which is not actively taking new connections
@@ -34,8 +34,8 @@ namespace com_curiousorigins_simplegroupcommserver {
      * @param c - config file settings
      * @param active - the active client handler
      */
-    ClientHandler::ClientHandler(const Config *c, ClientHandler *const active):
-            config(c), active(active){}
+    ClientHandler::ClientHandler(const Config *c, ClientHandler *const active, ClientManager * allClients):
+            config(c), active(active), allClients(allClients){}
 
 
     ClientHandler::~ClientHandler(){
@@ -70,6 +70,7 @@ namespace com_curiousorigins_simplegroupcommserver {
             clock_gettime(CLOCK_MONOTONIC, &start);
             for(processor=processors.begin(); processor!=processors.end(); ) {
                 if(processor->second->process() == PROCESS_CLOSE_REQUEST){
+                    allClients->remove(processor->second->key());
                     delete processor->second;
                     processors.erase(processor++);
                 }
@@ -102,7 +103,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         }
 
-        PDBG(TAG,"Shouldn't have gotten here")
+        PDBG(TAG,"Shouldn't have gotten here unless thread closed")
         return;
     }
 
@@ -111,27 +112,34 @@ namespace com_curiousorigins_simplegroupcommserver {
 
 
 
-    void ClientHandler::addProcessor(struct sockaddr *connectionInfo, int connfd, int clientID) {
+    void ClientHandler::addProcessor(struct sockaddr *connectionInfo, int connfd) {
+        uint32_t outClientID;
 
-        ClientProcessor * p = new ClientProcessor(config, connfd, connectionInfo, clientID);
+//        PDBG(TAG, "trying to add client %d", connfd)
+        if(allClients->add(connfd, outClientID)) {
 
-        processorListLock.lock();
-        if(processors.find(p->key()) == processors.end())
-            processors.insert(std::pair<int,ClientProcessor*>(p->key(), p));
-        else{
-            PDBG(TAG,"\n\nERROR: already inserted item\n\n");
+//            PDBG(TAG, "adding client %d", connfd)
+            ClientProcessor *p = new ClientProcessor(config, connfd, connectionInfo, outClientID,
+                                                     allClients);
+
+
+            processorListLock.lock();
+            if (processors.find(p->key()) == processors.end())
+                processors.insert(std::pair<int, ClientProcessor *>(p->key(), p));
+            else {
+                PDBG(TAG, "\n\nERROR: already inserted item\n\n");
+                processorListLock.unlock();
+                return;
+            }
             processorListLock.unlock();
-            return;
-        }
-        processorListLock.unlock();
 
-        if(!listen){
-            PDBG(TAG,"Starting listen thread");
-            listen=true;
-            pthread_create(&handlerThread, NULL, &clientWorkWrapper, this);
-        }
-        else{
-            PDBG(TAG,"listening thread already started");
+            if (!listen) {
+                PDBG(TAG, "Starting listen thread");
+                listen = true;
+                pthread_create(&handlerThread, NULL, &clientWorkWrapper, this);
+            } else {
+                PDBG(TAG, "listening thread already started");
+            }
         }
     }
 
