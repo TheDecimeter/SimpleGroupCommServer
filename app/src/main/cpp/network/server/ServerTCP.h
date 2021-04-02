@@ -5,6 +5,7 @@
 #ifndef SIMPLEGROUPCOMMSERVER_SERVERTCP_H
 #define SIMPLEGROUPCOMMSERVER_SERVERTCP_H
 
+#include "../../debug.h"
 #include<pthread.h>
 #include "ClientHandler.h"
 #include "storage/ClientManager.h"
@@ -16,6 +17,9 @@ namespace com_curiousorigins_simplegroupcommserver {
 
     class ServerTCP {
     private:
+#ifdef MEM_TEST
+        char MEM_TEST_BLOCK[MEM_TEST_SIZE];
+#endif
         const Config * config;
         ClientCreator * afterCreated;
         unsigned int clientCount=0;

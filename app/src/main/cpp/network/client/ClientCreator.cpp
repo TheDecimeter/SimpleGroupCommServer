@@ -25,7 +25,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
     ClientCreator::ClientCreator(Config * c):
     config(c){
-        for(int i=0; i<3; ++i)
+        for(int i=0; i<20; ++i)
             clients.push_back(new Client(c));
     }
 
@@ -71,8 +71,13 @@ namespace com_curiousorigins_simplegroupcommserver {
         std::vector<Client*>::iterator i;
         for(i=clients.begin(); i!=clients.end(); i++)
             (*i)->start();
-        relay();
 
+        relayTest(100);
+
+
+
+        for(i=clients.begin(); i!=clients.end(); i++)
+            (*i)->stop();
 //int x=4;
 //PDBG(TAG, "x init: %d", x);
 //int &y = x;
@@ -104,11 +109,6 @@ namespace com_curiousorigins_simplegroupcommserver {
     }
 
     void ClientCreator::disconnectStress(int times) {
-
-
-
-        //TODO send data tests
-
         std::vector<pthread_t> onGoingWork;
 //
         for(int i=0; i<times; ++i) {
@@ -131,22 +131,65 @@ namespace com_curiousorigins_simplegroupcommserver {
     /**
      * test relaying messages from one client to another
      */
-    void ClientCreator::relay() {
-        const int ex=5, l=ex+80;
-        char data[l];
-        uint32_t to = 0;
-        data[0]='R';
-        *(reinterpret_cast<uint32_t*>(data+1))=htonl(to+1);
-        int dataLen = sprintf(data+ex, "%s","toot to la fruit") + ex;
-        if(dataLen > 0 && dataLen <= l+ex){
-            clients[2]->send(data, static_cast<size_t>(dataLen));
-        }
+    bool ClientCreator::relay(const int count, const uint32_t from, const uint32_t to) {
+        const int ex=2, l=ex+80;
+        char data[l], rcv[l], msg[l];
 
-        char rcv[l];
-        clients[to]->receive(rcv, static_cast<size_t>(dataLen - ex));
-        std::string prt = ScreenConsole::s(rcv,dataLen-ex);
-        ScreenConsole::print(prt);
-        PDBG(TAG, "received %s", prt.c_str());
+        bzero(data,l);
+        data[0]='R';
+        //*(reinterpret_cast<uint32_t*>(data+1))=htonl(to+1);
+        data[1]= static_cast<char>(to + 1);
+
+        bzero(msg,l);
+        int msgLen = sprintf(msg, "msg: %d %d", rand(), rand());
+        if(msgLen > 0 && msgLen <=l) {
+
+            PDBG(TAG, "from: %d, to %d: %s", from+1, data[1], msg);
+//            ScreenConsole::print({"sending msg: ", std::to_string(count)});
+            int dataLen = sprintf(data + ex, "%s", msg) + ex;
+            if (dataLen > 0 && dataLen <= l) {
+                clients[from]->send(data, static_cast<size_t>(dataLen));
+
+//                return true;
+
+                bzero(rcv,l);
+                clients[to]->receive(rcv);
+                std::string prt = ScreenConsole::s(rcv, dataLen - ex);
+
+                ScreenConsole::print({prt, " i:",std::to_string(count)});
+                PDBG(TAG, "received %s", prt.c_str());
+
+                if(strncmp(msg, rcv, static_cast<size_t>(msgLen)) == 0)
+                    return true;
+
+                ScreenConsole::print({"no match{\ns: ", msg, "\nr: ", rcv, "  }"});
+                PDBG(TAG, "no match \ns:%s\nr:%s", msg, prt.c_str());
+                return false;
+
+            } else{
+                PDBG(TAG, "unable to package msg: %s", msg)
+                ScreenConsole::print({"unable to package msg", msg});
+            }
+        }else{
+            PDBG(TAG, "unable to package create message")
+            ScreenConsole::print("unable to package create message");
+        }
+        return true;
+    }
+
+    void ClientCreator::relayTest(int times) {
+//        usleep(500000);
+        uint32_t size=clients.size();
+
+        for(int i=0; i<times; ++i)
+            if(!relay(i, rand() % size, rand() % size)) {
+                PDBG(TAG, "failed test")
+                ScreenConsole::print("failed test");
+                return;
+            }
+
+        PDBG(TAG, "passed all tests")
+        ScreenConsole::print("passed all tests");
     }
 
     ClientCreator::SpeakData::SpeakData(Client *from, Client *to, const char *data, int & status) :

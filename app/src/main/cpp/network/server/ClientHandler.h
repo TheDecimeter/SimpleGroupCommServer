@@ -11,12 +11,16 @@
 #include <mutex>
 
 #include "../../util/Config.h"
+#include "../../debug.h"
 #include "ClientProcessor.h"
 
 namespace com_curiousorigins_simplegroupcommserver {
 
     class ClientHandler {
     private:
+#ifdef MEM_TEST
+        char MEM_TEST_BLOCK[MEM_TEST_SIZE];
+#endif
         const Config* config;
         pthread_t handlerThread;
         bool listen=false;

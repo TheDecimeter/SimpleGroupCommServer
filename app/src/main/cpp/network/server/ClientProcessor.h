@@ -6,6 +6,7 @@
 #define SIMPLEGROUPCOMMSERVER_CLIENTPROCESSOR_H
 
 #include "../../util/Config.h"
+#include "../../debug.h"
 #include "ClientResponder.h"
 #include "storage/ClientManager.h"
 
@@ -20,6 +21,9 @@ namespace com_curiousorigins_simplegroupcommserver {
         friend class ClientResponder;
 
     private:
+#ifdef MEM_TEST
+        char MEM_TEST_BLOCK[MEM_TEST_SIZE];
+#endif
         char * buf, * readerPos, *clientAddr;
         //buflen - length of buffer (>=bytesToRead and dataLen),
         // bytesToRead - bytes left in stream (<= dataLen),

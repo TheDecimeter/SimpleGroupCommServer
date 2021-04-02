@@ -3,6 +3,8 @@
 
 #define DEBUG
 #define PRINT
+#define MEM_TEST
+#define MEM_TEST_SIZE 10240
 
 
 #ifdef DEBUG

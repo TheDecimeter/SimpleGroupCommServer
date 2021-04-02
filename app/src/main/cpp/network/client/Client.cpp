@@ -67,12 +67,43 @@ namespace com_curiousorigins_simplegroupcommserver {
         connected=false;
     }
 
-    void Client::receive(char *data, size_t dataLen) {
+    void Client::receive(char *data) {
         if(connected){
-            ssize_t bytesRead = read(socketID, data, dataLen);
-            if(bytesRead==0){
-                PDBG(TAG,"should close client, received 0");
-            }
+            ssize_t bytesRead;
+            unsigned char lenLeft, len;
+//            do {
+                bytesRead = read(socketID, &len, 1);
+                if(bytesRead==0){
+                    PDBG(TAG,"should close client, received 0");
+                    return;
+                }
+                else if(bytesRead<0){
+                    PDBG(TAG,"error received %d", errno);
+                    return;
+                }
+                lenLeft=len;
+                bytesRead = read(socketID, data, lenLeft);
+
+                if(bytesRead == lenLeft){
+//                    PDBG(TAG, "finished reading %d of %d", bytesRead, dataLen)
+                    return;
+                }else if(bytesRead < lenLeft) {
+                    PDBG(TAG,"didn't get all bytes %d < %d", bytesRead, len);
+                }else if(bytesRead==0){
+                    PDBG(TAG,"should close client, received 0");
+                    return;
+                }
+                else if(bytesRead<0){
+                    PDBG(TAG,"error received %d", errno);
+                    return;
+                }
+
+                data+=bytesRead;
+                lenLeft-=bytesRead;
+//            }while(true);
+
+
+
         }
         else{
             PDBG(TAG,"can't send data with unconnected socket")
@@ -85,19 +116,19 @@ namespace com_curiousorigins_simplegroupcommserver {
 //            ScreenConsole::print({"Client snd: ",data,"\n"});
 
             ssize_t bytesL = write(socketID, &dataLen, 1);
-            if(bytesL <= 0){
-                PDBG(TAG,"failed to send all %d", errno);
+            if(bytesL < 1){
+                PDBG(TAG,"failed to send size: %d e: %d", bytesL, errno);
             }
 //            else{
-//                PDBGF(TAG,"Client sent Size: %d", bytesL);
+//                PDBG(TAG,"Client sent Size: %d 1", bytesL);
 //            }
 
             ssize_t bytes = write(socketID, data, dataLen);
-            if(bytes <= 0){
-                PDBG(TAG,"failed to send all %d", bytes);
+            if(bytes < dataLen){
+                PDBG(TAG,"failed to send size: %d of %d e: %d", bytes, dataLen, errno);
             }
 //            else{
-//                PDBGF(TAG,"Client sent Size: %d", bytes);
+//                PDBG(TAG,"Client sent Size: %d %d", bytes, dataLen);
 //            }
         }
         else{
