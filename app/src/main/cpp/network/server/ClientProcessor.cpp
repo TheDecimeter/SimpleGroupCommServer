@@ -85,7 +85,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         dataLen=len; //increase length size by one to compensate for message type byte
         bytesToRead=dataLen;
-        PDBG(TAG, "need to read of length %d", len);
+//        PDBG(TAG, "need to read of length %d", len);
 
         if(bufLen < dataLen){
             delete buf;
@@ -102,16 +102,16 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         if(bytesRead == bytesToRead){ //done reading object
             state=ST_PROCESS_DATA;
-            PDBG(TAG, "rcv frm %d : %s", id, ScreenConsole::s(buf,dataLen).c_str())
+//            PDBG(TAG, "rcv frm %d : %s", id, ScreenConsole::s(buf,dataLen).c_str())
 
-            ScreenConsole::print({"Server rcv: ", ScreenConsole::s(buf,dataLen),"\n"});
+//            ScreenConsole::print({"Server rcv: ", ScreenConsole::s(buf,dataLen),"\n"});
             //ScreenConsole::print({"Server rcv: ", buf,"\n"});
 
             responder.process(buf, dataLen);
 
             return dataLen;
         }else if(bytesRead>0){ //need to read more
-            PDBG(TAG, "Server rcv partial: %s", ScreenConsole::s(readerPos,bytesRead).c_str())
+//            PDBG(TAG, "Server rcv partial: %s", ScreenConsole::s(readerPos,bytesRead).c_str())
             bytesToRead -= bytesRead;
             readerPos += bytesRead;
             return bytesRead;

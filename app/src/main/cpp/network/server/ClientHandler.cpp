@@ -118,7 +118,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 //        PDBG(TAG, "trying to add client %d", connfd)
         if(allClients->add(connfd, outClientID)) {
 
-//            PDBG(TAG, "adding client %d", connfd)
+            PDBG(TAG, "adding client %d", outClientID)
             ClientProcessor *p = new ClientProcessor(config, connfd, connectionInfo, outClientID,
                                                      allClients);
 

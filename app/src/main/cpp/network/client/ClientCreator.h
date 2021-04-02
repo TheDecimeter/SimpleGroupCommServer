@@ -28,6 +28,8 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         static void* creationWorkWrapper(void* clientCreator);
         void creationWork();
+        void disconnectStress(int times);
+        void relay();
         static void* speak_work(void* speakData);
         static pthread_t speak(Client * from, Client * to, const char* data, int& status);
 

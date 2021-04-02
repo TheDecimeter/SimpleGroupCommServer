@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
+#include <endian.h>
 
 
 #define TAG "ClientCreatorCpp"
@@ -24,7 +25,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
     ClientCreator::ClientCreator(Config * c):
     config(c){
-        for(int i=0; i<20; ++i)
+        for(int i=0; i<3; ++i)
             clients.push_back(new Client(c));
     }
 
@@ -67,72 +68,10 @@ namespace com_curiousorigins_simplegroupcommserver {
 
 
     void ClientCreator::creationWork() {
-        int MAX = config->bufferSize;
-        //create connections
         std::vector<Client*>::iterator i;
         for(i=clients.begin(); i!=clients.end(); i++)
             (*i)->start();
-
-
-        //TODO send data tests
-
-        std::vector<pthread_t> onGoingWork;
-//
-        for(int i=0; i<100000; ++i) {
-            int r = rand() % clients.size();
-            clients[r]->stop();
-            //usleep(10000);
-            clients[r]->start();
-        }
-        clients[2]->send("3tst1\0",6);
-        clients[2]->send("3tst2\0",6);
-        clients[2]->send("3tst3\0",6);
-        clients[2]->send("3tst4\0",6);
-        clients[2]->send("3tst5\0",6);
-        clients[2]->send("3tst6\0",6);
-        clients[2]->send("3tst7\0",6);
-        clients[2]->send("3tst8\0",6);
-        clients[2]->send("3tst9\0",6);
-
-
-//        clients[0]->sendChunk("\x06",1);
-//        clients[0]->sendChunk("1ts",3);
-//
-//        clients[1]->send("2tst1\0",6);
-//
-//        usleep(500000);
-//        clients[0]->sendChunk("t1\0",3);
-//
-//        clients[1]->send("2tst2\0",6);
-//
-//        clients[0]->send("1tst2\0",6);
-//        clients[0]->send("1tst3\0",6);
-//
-//        clients[1]->stop();
-//
-//        //char* data = new char[MAX];
-//        //StringTools::fill("R0\x1F""1\x1E""test from 0 to 1\x1D", NULL, MAX);
-//        int status = ST_UNSET;
-//        onGoingWork.push_back(speak(clients[0],clients[1],"R0\x1F""1\x1E""test from 0 to 1\x1D",status));
-//
-//
-//
-//
-//
-//        std::vector<pthread_t>::iterator ti;
-//        for(ti=onGoingWork.begin(); ti!=onGoingWork.end(); ti++)
-//            pthread_join(*ti, NULL);
-//
-//        PDBG(TAG,"finished tests");
-//        ScreenConsole::print("finished server tests\n");
-
-
-
-
-//        ClientInfo * spot = new ClientInfo();
-//        ClientInfo * info = new(spot) ClientInfo(1,1);
-//        delete info;
-
+        relay();
 
 //int x=4;
 //PDBG(TAG, "x init: %d", x);
@@ -162,6 +101,52 @@ namespace com_curiousorigins_simplegroupcommserver {
     void *ClientCreator::creationWorkWrapper(void *clientCreator) {
         ((ClientCreator*)clientCreator)->creationWork();
         return nullptr;
+    }
+
+    void ClientCreator::disconnectStress(int times) {
+
+
+
+        //TODO send data tests
+
+        std::vector<pthread_t> onGoingWork;
+//
+        for(int i=0; i<times; ++i) {
+            int r = rand() % clients.size();
+            clients[r]->stop();
+            //usleep(10000);
+            clients[r]->start();
+        }
+        clients[2]->send("3tst1\0",6);
+        clients[2]->send("3tst2\0",6);
+        clients[2]->send("3tst3\0",6);
+        clients[2]->send("3tst4\0",6);
+        clients[2]->send("3tst5\0",6);
+        clients[2]->send("3tst6\0",6);
+        clients[2]->send("3tst7\0",6);
+        clients[2]->send("3tst8\0",6);
+        clients[2]->send("3tst9\0",6);
+    }
+
+    /**
+     * test relaying messages from one client to another
+     */
+    void ClientCreator::relay() {
+        const int ex=5, l=ex+80;
+        char data[l];
+        uint32_t to = 0;
+        data[0]='R';
+        *(reinterpret_cast<uint32_t*>(data+1))=htonl(to+1);
+        int dataLen = sprintf(data+ex, "%s","toot to la fruit") + ex;
+        if(dataLen > 0 && dataLen <= l+ex){
+            clients[2]->send(data, static_cast<size_t>(dataLen));
+        }
+
+        char rcv[l];
+        clients[to]->receive(rcv, static_cast<size_t>(dataLen - ex));
+        std::string prt = ScreenConsole::s(rcv,dataLen-ex);
+        ScreenConsole::print(prt);
+        PDBG(TAG, "received %s", prt.c_str());
     }
 
     ClientCreator::SpeakData::SpeakData(Client *from, Client *to, const char *data, int & status) :

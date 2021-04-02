@@ -13,6 +13,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         const uint32_t id;
         const int socketID;
         ClientInfo(uint32_t id, int socketID);
+        ClientInfo(ClientInfo &other);
         ClientInfo();
         ~ClientInfo();
     };

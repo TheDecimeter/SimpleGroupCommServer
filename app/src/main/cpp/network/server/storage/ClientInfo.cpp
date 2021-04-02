@@ -23,4 +23,9 @@ namespace com_curiousorigins_simplegroupcommserver {
 //        PDBG(TAG, "                  deleting %d at %p",socketID, this)
     }
 
+    ClientInfo::ClientInfo(ClientInfo &other):
+    id(other.id), socketID(other.socketID){
+
+    }
+
 }

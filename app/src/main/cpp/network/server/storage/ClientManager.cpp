@@ -84,13 +84,13 @@ namespace com_curiousorigins_simplegroupcommserver {
         lock.unlock();
     }
 
-    bool ClientManager::tryGet(uint32_t id, ClientInfo * out){
+    bool ClientManager::tryGet(uint32_t id, ClientInfo * outSpot){
         bool r=false;
         lock.lock_shared();
         std::unordered_map<uint32_t,ClientInfo*>::iterator it = clients.find(id);
         if(it != clients.end()){
             r=true;
-            out = it->second;
+            new(outSpot) ClientInfo(*(it->second));
         }
         lock.unlock_shared();
 

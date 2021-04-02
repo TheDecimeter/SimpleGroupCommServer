@@ -9,17 +9,22 @@
 #include "../../util/Runnable.h"
 #include "storage/ClientManager.h"
 
+#define NO_REACT 0
+#define RELAY_REACT 'R'
+
 namespace com_curiousorigins_simplegroupcommserver {
 
     class ClientResponder {
     private:
         Runnable * worker = NULL;
         ClientManager * allClients;
-        void process(const char dataType, const char * data, const unsigned char len) const;
+        char reactionType = NO_REACT;
+        void process(const char reactionType, const char * data, const unsigned char len);
+        void relay(const char * data, const unsigned char len);
 
     public:
         ClientResponder(ClientManager * allClients);
-        void process(const char * data, unsigned char len) const;
+        void process(const char * data, unsigned char len);
         bool process();
     };
 
