@@ -28,7 +28,6 @@ namespace com_curiousorigins_simplegroupcommserver {
         int serverSocketID;
         pthread_t serverThread;
         ClientHandler * current;
-        std::unordered_map<int, ClientHandler*> clientHandlers;
 
         static void* serverWorkWrapper(void* thiz);
         void serverWork();

@@ -36,12 +36,19 @@ namespace com_curiousorigins_simplegroupcommserver {
         fcntl(socketID, F_SETFL, O_NONBLOCK);
 
         buf=new char[bufLen];
+        welcome();
     }
 
     ClientProcessor::~ClientProcessor() {
         delete clientAddr;
         delete buf;
         close(socketID);
+    }
+
+    void ClientProcessor::welcome(){
+        buf[0]=RELAY_REACT;
+        buf[1] = buf[2] = static_cast<unsigned char>(id);
+        responder.process(buf, 3);
     }
 
 

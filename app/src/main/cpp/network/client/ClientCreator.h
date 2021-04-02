@@ -37,6 +37,8 @@ namespace com_curiousorigins_simplegroupcommserver {
         bool relay(const int count, const uint32_t from, const uint32_t to);
         static void* speak_work(void* speakData);
         static pthread_t speak(Client * from, Client * to, const char* data, int& status);
+        void startClients();
+        void stopClients();
 
     public:
         ClientCreator(Config * config);

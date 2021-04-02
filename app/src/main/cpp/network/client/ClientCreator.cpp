@@ -66,18 +66,33 @@ namespace com_curiousorigins_simplegroupcommserver {
         return speakThread;
     }
 
-
-    void ClientCreator::creationWork() {
+    void ClientCreator::startClients() {
         std::vector<Client*>::iterator i;
         for(i=clients.begin(); i!=clients.end(); i++)
             (*i)->start();
 
-        relayTest(100);
-
-
+        for(i=clients.begin(); i!=clients.end(); i++)
+            (*i)->greet();
 
         for(i=clients.begin(); i!=clients.end(); i++)
+            PDBG(TAG, "client has id %d", (*i)->getID());
+    }
+
+    void ClientCreator::stopClients() {
+        std::vector<Client*>::iterator i;
+        for(i=clients.begin(); i!=clients.end(); i++)
             (*i)->stop();
+    }
+
+    void ClientCreator::creationWork() {
+        startClients();
+
+        PDBG(TAG, "[ \n\ndone starting clients\n\n ]");
+
+        relayTest(10);
+
+        stopClients();
+
 //int x=4;
 //PDBG(TAG, "x init: %d", x);
 //int &y = x;
@@ -138,10 +153,12 @@ namespace com_curiousorigins_simplegroupcommserver {
         bzero(data,l);
         data[0]='R';
         //*(reinterpret_cast<uint32_t*>(data+1))=htonl(to+1);
-        data[1]= static_cast<char>(to + 1);
+//        data[1]= static_cast<unsigned char>(to + 1);
+        const uint32_t toServ = static_cast<const uint32_t>(clients[to]->getID());
+        data[1]= static_cast<unsigned char>(toServ);
 
         bzero(msg,l);
-        int msgLen = sprintf(msg, "msg: %d %d", rand(), rand());
+        int msgLen = sprintf(msg, "msg: %d %d i:%d", rand(), rand(), count);
         if(msgLen > 0 && msgLen <=l) {
 
             PDBG(TAG, "from: %d, to %d: %s", from+1, data[1], msg);
@@ -156,7 +173,7 @@ namespace com_curiousorigins_simplegroupcommserver {
                 clients[to]->receive(rcv);
                 std::string prt = ScreenConsole::s(rcv, dataLen - ex);
 
-                ScreenConsole::print({prt, " i:",std::to_string(count)});
+                ScreenConsole::print(prt);
                 PDBG(TAG, "received %s", prt.c_str());
 
                 if(strncmp(msg, rcv, static_cast<size_t>(msgLen)) == 0)
@@ -191,6 +208,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         PDBG(TAG, "passed all tests")
         ScreenConsole::print("passed all tests");
     }
+
 
     ClientCreator::SpeakData::SpeakData(Client *from, Client *to, const char *data, int & status) :
     status(status), from(from), to(to), data(data){    }

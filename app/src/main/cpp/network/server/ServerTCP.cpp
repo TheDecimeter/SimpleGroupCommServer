@@ -145,6 +145,7 @@ namespace com_curiousorigins_simplegroupcommserver{
     }
 
     ServerTCP::~ServerTCP() {
+        PDBG(TAG, "start delete")
         stop();
 
         if(close(serverSocketID) == 0){
@@ -154,15 +155,12 @@ namespace com_curiousorigins_simplegroupcommserver{
             PDBG(TAG,"failed to close server %d", errno);
         }
 
-        for(std::unordered_map<int,ClientHandler*>::iterator it = clientHandlers.begin(); it != clientHandlers.end(); it++){
-            delete it->second;
-        }
         delete current;
 
             //delete clients;
 //            clients= nullptr;
 
-
+        PDBG(TAG, "end delete")
     }
 
 }

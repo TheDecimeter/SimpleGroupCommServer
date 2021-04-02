@@ -13,6 +13,7 @@
 namespace com_curiousorigins_simplegroupcommserver {
 
     Config::Config() :
+//            port(static_cast<const uint32_t>((rand() % 10000) + 12001)),
             port(static_cast<const uint32_t>((rand() % 10000) + 12000)),
             bufferSize(80),
              longestLoad(30000000),

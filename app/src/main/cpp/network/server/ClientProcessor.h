@@ -38,6 +38,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         ssize_t processData();
         ssize_t processResponse();
         void terminate();
+        void welcome();
 
     public:
         ClientProcessor(const Config * c, int socketID, struct sockaddr * connectionInfo, uint32_t id, ClientManager * allClients);

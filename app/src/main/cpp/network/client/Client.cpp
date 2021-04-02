@@ -56,7 +56,7 @@ namespace com_curiousorigins_simplegroupcommserver {
     }
 
     void Client::stop() {
-        PDBG(TAG, "stopping client");
+        PDBG(TAG, "stopping client %d", clientID);
         if(connected)
             close(socketID);
         connected=false;
@@ -72,6 +72,7 @@ namespace com_curiousorigins_simplegroupcommserver {
             ssize_t bytesRead;
             unsigned char lenLeft, len;
 //            do {
+                PDBG(TAG, "reading for %d", clientID);
                 bytesRead = read(socketID, &len, 1);
                 if(bytesRead==0){
                     PDBG(TAG,"should close client, received 0");
@@ -81,11 +82,14 @@ namespace com_curiousorigins_simplegroupcommserver {
                     PDBG(TAG,"error received %d", errno);
                     return;
                 }
+                else{
+                    PDBG(TAG, "ready to receive object of %d bytes", len);
+                }
                 lenLeft=len;
                 bytesRead = read(socketID, data, lenLeft);
 
                 if(bytesRead == lenLeft){
-//                    PDBG(TAG, "finished reading %d of %d", bytesRead, dataLen)
+                    PDBG(TAG, "finished reading: %d of %d", bytesRead, len)
                     return;
                 }else if(bytesRead < lenLeft) {
                     PDBG(TAG,"didn't get all bytes %d < %d", bytesRead, len);
@@ -106,7 +110,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         }
         else{
-            PDBG(TAG,"can't send data with unconnected socket")
+            PDBG(TAG,"can't receive data with unconnected socket %d", clientID)
         }
     }
 
@@ -132,7 +136,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 //            }
         }
         else{
-            PDBG(TAG,"can't send data with unconnected socket")
+            PDBG(TAG,"can't send data with unconnected socket %d", clientID)
         }
     }
 
@@ -150,10 +154,21 @@ namespace com_curiousorigins_simplegroupcommserver {
 //            }
         }
         else{
-            PDBG(TAG,"can't send data with unconnected socket")
+            PDBG(TAG,"can't send data with unconnected socket %d", clientID)
         }
     }
 
+    void Client::greet() {
+        char r[4];
+        PDBG(TAG, "   GREETING")
+        receive(r);
+        clientID=r[0];
+        PDBG(TAG, "greetings from client %d", clientID)
+    }
+
+    int Client::getID() {
+        return clientID;
+    }
 
 
 }

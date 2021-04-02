@@ -77,7 +77,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
             infoSpot.~ClientInfo();
             if(allClients->tryGet(relayTo, &infoSpot)){
-//                PDBG(TAG, "rcv send %s size %d to %d at socket %d", ScreenConsole::s(data, l).c_str(), l, relayTo, to.socketID)
+                PDBG(TAG, "rcv send size %d to %d at socket %d", len, relayTo, infoSpot.socketID)
 
                 send(data, len);
 

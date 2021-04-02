@@ -39,11 +39,13 @@ namespace com_curiousorigins_simplegroupcommserver {
 
 
     ClientHandler::~ClientHandler(){
+        PDBG(TAG, "start delete")
         listen=false;
         std::unordered_map<int,ClientProcessor*>::iterator processor;
         for(processor=processors.begin(); processor!=processors.end(); processor++) {
             delete processor->second;
         }
+        PDBG(TAG, "end delete")
     }
 
     void *ClientHandler::clientWorkWrapper(void *thiz) {

@@ -66,7 +66,9 @@ namespace com_curiousorigins_simplegroupcommserver {
 
     static void createNative(JNIEnv *env, jobject thiz){
         PDBG(TAG, "starting native methods")
-        srand(time(NULL));
+        long tt = time(NULL);
+        PDBG(TAG, "seeding random %ld", tt);
+        srand(tt);
         //env->GetJavaVM(&jvm);
        // ScreenConsole::bind(jvm,env);
 

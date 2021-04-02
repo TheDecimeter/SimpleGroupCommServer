@@ -16,7 +16,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         char MEM_TEST_BLOCK[MEM_TEST_SIZE];
 #endif
         const Config * config;
-        int socketID=0, clientID;
+        int socketID=0, clientID=-1;
         bool connected=false;
 
     public:
@@ -25,6 +25,8 @@ namespace com_curiousorigins_simplegroupcommserver {
         void sendChunk(const char* data, size_t dataLen);
         void receive(char* data);
         bool start();
+        void greet();
+        int getID();
         void stop();
     };
 }

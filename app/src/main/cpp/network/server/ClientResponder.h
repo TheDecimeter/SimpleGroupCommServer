@@ -10,6 +10,7 @@
 #include "../../debug.h"
 #include "storage/ClientManager.h"
 
+
 #define NO_REACT 0
 #define RELAY_REACT 'R'
 
@@ -37,6 +38,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         void process(char * data, unsigned char len);
         bool process();
     };
+
 
 }
 
