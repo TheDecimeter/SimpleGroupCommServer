@@ -28,27 +28,27 @@ namespace com_curiousorigins_simplegroupcommserver {
 
 
     ClientProcessor::ClientProcessor(const Config *c, int socketID, struct sockaddr * connectionInfo, uint32_t id, ClientManager * allClients):
-    socketID(socketID), state(ST_READ_LEN), bufLen(255), id(id), allClients(allClients), responder(allClients){ //TODO change bufLen to be a respectable size
+    socketID(socketID), state(ST_READ_LEN), id(id), allClients(allClients), responder(allClients),
+    buffer(255){ //TODO change bufLen to be a respectable size
         setClientAddr(connectionInfo);
         PDBG(TAG,"connection from %s",clientAddr);
         ScreenConsole::print({"Svr cnnt to: ",clientAddr,"\n"});
 
         fcntl(socketID, F_SETFL, O_NONBLOCK);
 
-        buf=new char[bufLen];
         welcome();
     }
 
     ClientProcessor::~ClientProcessor() {
         delete clientAddr;
-        delete buf;
         close(socketID);
     }
 
     void ClientProcessor::welcome(){
-        buf[0]=RELAY_REACT;
-        buf[1] = buf[2] = static_cast<unsigned char>(id);
-        responder.process(buf, 3);
+        buffer.data[0]=RELAY_REACT;
+        buffer.data[1] = buffer.data[2] = static_cast<unsigned char>(id);
+        buffer.objLen=3;
+        responder.process(&buffer);
     }
 
 
@@ -63,7 +63,7 @@ namespace com_curiousorigins_simplegroupcommserver {
             }
             case ST_READ_DATA: {
                 ssize_t l = processData();
-                if(l != dataLen)
+                if(l != buffer.objLen)
                     return l;
             }
             case ST_PROCESS_DATA: {
@@ -90,37 +90,34 @@ namespace com_curiousorigins_simplegroupcommserver {
             return -1;
         }
 
-        dataLen=len; //increase length size by one to compensate for message type byte
-        bytesToRead=dataLen;
+//        dataLen=len; //increase length size by one to compensate for message type byte
 //        PDBG(TAG, "need to read of length %d", len);
 
-        if(bufLen < dataLen){
-            delete buf;
-            bufLen=dataLen;
-            buf = new char[dataLen];
+        if(buffer.dataLen < len){
+            buffer.resize(len);
         }
-        readerPos = buf;
+        buffer.reset(len);
         state = ST_READ_DATA;
         return 1;
     }
 
     ssize_t ClientProcessor::processData() {
-        ssize_t bytesRead = read(socketID, readerPos, bytesToRead);
+        ssize_t bytesRead = buffer.fillBuffer(socketID);
 
-        if(bytesRead == bytesToRead){ //done reading object
+        if(bytesRead == buffer.bytesToRead){ //done reading object
             state=ST_PROCESS_DATA;
 //            PDBG(TAG, "rcv frm %d : %s", id, ScreenConsole::s(buf,dataLen).c_str())
 
 //            ScreenConsole::print({"Server rcv: ", ScreenConsole::s(buf,dataLen),"\n"});
             //ScreenConsole::print({"Server rcv: ", buf,"\n"});
 
-            responder.process(buf, dataLen);
+            responder.process(&buffer);
 
-            return dataLen;
+            return buffer.objLen;
         }else if(bytesRead>0){ //need to read more
 //            PDBG(TAG, "Server rcv partial: %s", ScreenConsole::s(readerPos,bytesRead).c_str())
-            bytesToRead -= bytesRead;
-            readerPos += bytesRead;
+            buffer.bytesToRead -= bytesRead;
+            buffer.readerPosition += bytesRead;
             return bytesRead;
         }else if(bytesRead == 0){ //need to close socket
             terminate();

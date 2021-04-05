@@ -27,7 +27,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         bool add(int socketID, uint32_t &outID);
         void remove(uint32_t id);
         bool contains(uint32_t id);
-        bool tryGet(uint32_t id, ClientInfo * outSpot);
+        bool tryGet(uint32_t id, ClientInfo ** outSpot);
     };
 }
 

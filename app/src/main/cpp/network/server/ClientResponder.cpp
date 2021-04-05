@@ -24,9 +24,12 @@ namespace com_curiousorigins_simplegroupcommserver {
      * @param data - a pointer to some data somewhere, this is never deleted
      * @param len - the length of the data
      */
-    void ClientResponder::process(char *data, unsigned char len){
-        if(len>0)
-            process(data[0], data+1, --len);
+    void ClientResponder::process(Buffer * buffer){
+        if(buffer->objLen>0) {
+            buffer->readerPosition=buffer->data+1;
+            buffer->objLen--;
+            process(buffer->data[0], buffer);
+        }
     }
 
     /**
@@ -35,11 +38,11 @@ namespace com_curiousorigins_simplegroupcommserver {
      * @param data
      * @param len
      */
-    void ClientResponder::process(const char reactionType, char *data, const unsigned char len){
+    void ClientResponder::process(const char reactionType, Buffer * buffer){
         this->reactionType = reactionType;
         switch(reactionType){
             case RELAY_REACT:{
-                relay(reinterpret_cast<unsigned char *>(data), len);
+                relay(buffer);
                 break;
             }
             case NO_REACT: default:{
@@ -68,18 +71,17 @@ namespace com_curiousorigins_simplegroupcommserver {
         }
     }
 
-    void ClientResponder::relay(unsigned char *data, const unsigned char len) {
-        if(len > 1) {
-            uint32_t relayTo = (uint32_t) (data[0]);//ntohl(*(reinterpret_cast<const uint32_t*>(data)));
-            data[0] = static_cast<unsigned char>(len - 1);
+    void ClientResponder::relay(Buffer * buffer) {
+        if(buffer->objLen > 1) {
+            uint32_t relayTo = (uint32_t) (buffer->readerPosition[0]);//ntohl(*(reinterpret_cast<const uint32_t*>(data)));
+            buffer->readerPosition[0] = static_cast<unsigned char>(buffer->objLen - 1);
             //PDBG(TAG, "rcv relay to %d : %s", relayTo, ScreenConsole::s(data, l).c_str())
             //ScreenConsole::print({"S rcv: ", ScreenConsole::s(data, l), "\n"});
 
-            infoSpot.~ClientInfo();
             if(allClients->tryGet(relayTo, &infoSpot)){
-                PDBG(TAG, "rcv send size %d to %d at socket %d", len, relayTo, infoSpot.socketID)
+                PDBG(TAG, "rcv send size %d to %d at socket %d", buffer->objLen, relayTo, infoSpot->socketID)
 
-                send(data, len);
+                send(buffer);
 
             }
             else{
@@ -93,10 +95,10 @@ namespace com_curiousorigins_simplegroupcommserver {
         }
     }
 
-    void ClientResponder::send(const void *data, const unsigned char len) {
-        ssize_t bytesWritten = write(infoSpot.socketID,data, len);
-        if(bytesWritten != len){
-            PDBG(TAG, "mismatch l: %d, w: %d, e: %d", len, bytesWritten, errno)
+    void ClientResponder::send(Buffer * buffer) {
+        ssize_t bytesWritten = write(infoSpot->socketID,buffer->readerPosition, buffer->objLen);
+        if(bytesWritten != buffer->objLen){
+            PDBG(TAG, "mismatch l: %d, w: %d, e: %d", buffer->objLen, bytesWritten, errno)
         }
     }
 }

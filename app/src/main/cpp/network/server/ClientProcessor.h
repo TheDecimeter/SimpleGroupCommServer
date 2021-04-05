@@ -9,6 +9,7 @@
 #include "../../debug.h"
 #include "ClientResponder.h"
 #include "storage/ClientManager.h"
+#include "storage/Buffer.h"
 
 #include <netinet/in.h>
 
@@ -24,11 +25,9 @@ namespace com_curiousorigins_simplegroupcommserver {
 #ifdef MEM_TEST
         char MEM_TEST_BLOCK[MEM_TEST_SIZE];
 #endif
-        char * buf, * readerPos, *clientAddr;
-        //buflen - length of buffer (>=bytesToRead and dataLen),
-        // bytesToRead - bytes left in stream (<= dataLen),
-        // dataLen, total length of data
-        unsigned char bufLen, dataLen, bytesToRead, state;
+        char *clientAddr;
+        unsigned char state;
+        Buffer buffer;
         int socketID;
         uint32_t id;
         ClientResponder responder;

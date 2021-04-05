@@ -33,7 +33,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         if(next()){
 //            PDBG(TAG, "after next")
             ClientInfo * info = new(infoSpot) ClientInfo(clientCounter, socketID);
-            PDBG(TAG, "adding Info %d at %p %p", clientCounter, infoSpot, info);
+//            PDBG(TAG, "adding Info %d at %p %p", clientCounter, infoSpot, info);
             clients.insert(std::pair<int, ClientInfo*>(clientCounter, info));
             outID=clientCounter;
             lock.unlock();
@@ -75,31 +75,32 @@ namespace com_curiousorigins_simplegroupcommserver {
      * @param id - the id of the client to remove
      */
     void ClientManager::remove(uint32_t id) {
-        PDBG(TAG, "pre lock removing %d", id);
+//        PDBG(TAG, "pre lock removing %d", id);
         lock.lock();
-        PDBG(TAG, "post lock removing %d", id);
+//        PDBG(TAG, "post lock removing %d", id);
         std::unordered_map<uint32_t, ClientInfo*>::iterator it;
         it = clients.find(id);
         if(it != clients.end()) {
-            PDBG(TAG, "found %d", id);
+//            PDBG(TAG, "found %d", id);
             delete it->second; //XXX This might need to be changed out for destructor if I swap out for a pre allocated array
-            PDBG(TAG, "deleted %d", id);
+//            PDBG(TAG, "deleted %d", id);
             clients.erase(it);
-            PDBG(TAG, "erased %d", id);
+//            PDBG(TAG, "erased %d", id);
         }
         lock.unlock();
     }
 
-    bool ClientManager::tryGet(uint32_t id, ClientInfo * outSpot){
+    bool ClientManager::tryGet(uint32_t id, ClientInfo ** outSpot){
         bool r=false;
-        PDBG(TAG, "tryGet prelock for %d", id);
+//        PDBG(TAG, "tryGet prelock for %d", id);
         lock.lock_shared();
-        PDBG(TAG, "tryGet postLock for %d", id);
+//        PDBG(TAG, "tryGet postLock for %d", id);
         std::unordered_map<uint32_t,ClientInfo*>::iterator it = clients.find(id);
         if(it != clients.end()){
             r=true;
-            new(outSpot) ClientInfo(*(it->second));
-            PDBG(TAG, "caching Info at %p, but info is at %p", outSpot, (it->second));
+            //new(outSpot) ClientInfo(*(it->second));
+            *outSpot = it->second;
+//            PDBG(TAG, "caching Info at %p, but info is at %p", outSpot, (it->second));
         }
         lock.unlock_shared();
 

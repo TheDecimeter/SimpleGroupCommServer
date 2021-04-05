@@ -9,6 +9,7 @@
 #include "../../util/Runnable.h"
 #include "../../debug.h"
 #include "storage/ClientManager.h"
+#include "storage/Buffer.h"
 
 
 #define NO_REACT 0
@@ -27,15 +28,15 @@ namespace com_curiousorigins_simplegroupcommserver {
 #endif
         Runnable * worker = NULL;
         ClientManager * allClients;
-        ClientInfo infoSpot;
+        ClientInfo * infoSpot;
         char reactionType = NO_REACT;
-        void process(const char reactionType, char * data, const unsigned char len);
-        void relay(unsigned char * data, const unsigned char len);
-        void send(const void * data, const unsigned char len);
+        void process(const char reactionType, Buffer * buffer);
+        void relay(Buffer * buffer);
+        void send(Buffer * buffer);
 
     public:
         ClientResponder(ClientManager * allClients);
-        void process(char * data, unsigned char len);
+        void process(Buffer * buffer);
         bool process();
     };
 
