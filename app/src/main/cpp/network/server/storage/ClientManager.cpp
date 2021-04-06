@@ -52,19 +52,30 @@ namespace com_curiousorigins_simplegroupcommserver {
      */
     bool ClientManager::next() {
         clientCounter++;
+        if(clientCounter == UINT8_MAX - 1)
+            clientCounter=0;
         std::unordered_map<uint32_t, ClientInfo*>::iterator it;
         it = clients.find(clientCounter);
 
         if(it == clients.end())
             return true;
 
-        if(clients.size() * 2 >= UINT32_MAX) {
+//        if(clients.size() * 2 >= UINT32_MAX) {
+//            PDBG(TAG, "too many clients to create more %d", clients.size())
+//            return false;
+//        }
+        if(clients.size() == UINT8_MAX - 1) {
             PDBG(TAG, "too many clients to create more %d", clients.size())
             return false;
         }
+
+        clientCounter= static_cast<uint32_t>(rand() % (UINT8_MAX-1));
         while(it != clients.end()) {
 //            PDBG(TAG, "trying %d", clientCounter)
-            clientCounter = clientCounter = static_cast<uint32_t>(rand() + rand());
+//            clientCounter = clientCounter = static_cast<uint32_t>(rand() + rand());
+            clientCounter++;
+            if(clientCounter == UINT8_MAX - 1)
+                clientCounter=0;
             it = clients.find(clientCounter);
         }
         return true;

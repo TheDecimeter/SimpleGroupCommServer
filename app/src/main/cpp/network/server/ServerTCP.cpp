@@ -30,6 +30,7 @@ namespace com_curiousorigins_simplegroupcommserver{
 //        PDBG(TAG,"created server")
         stopFlag = true;
         current=new ClientHandler(c, &allClients);
+        current->name="1 1";
         this->afterCreated=afterCreated;
 //        clients = new std::unordered_map<int,ClientHandler*>;
     }

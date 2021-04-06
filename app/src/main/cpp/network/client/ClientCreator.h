@@ -39,6 +39,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         static pthread_t speak(Client * from, Client * to, const char* data, int& status);
         void startClients();
         void stopClients();
+        void reconnectSomeClients(int howMany);
 
     public:
         ClientCreator(Config * config);

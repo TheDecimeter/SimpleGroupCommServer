@@ -22,6 +22,8 @@
 namespace com_curiousorigins_simplegroupcommserver {
 
     bool Client::start() {
+        if(connected)
+            return true;
 
         int sockfd;
         struct sockaddr_in servaddr, cli;
@@ -57,8 +59,10 @@ namespace com_curiousorigins_simplegroupcommserver {
 
     void Client::stop() {
         PDBG(TAG, "stopping client %d", clientID);
-        if(connected)
+        if(connected) {
             close(socketID);
+            clientID = -1;
+        }
         connected=false;
     }
 
@@ -159,6 +163,8 @@ namespace com_curiousorigins_simplegroupcommserver {
     }
 
     void Client::greet() {
+        if(clientID!=-1)
+            return;
         char r[4];
         PDBG(TAG, "   GREETING")
         receive(r);

@@ -84,11 +84,28 @@ namespace com_curiousorigins_simplegroupcommserver {
             (*i)->stop();
     }
 
+
     void ClientCreator::creationWork() {
+        long t = time(NULL);
+        PDBG(TAG, "[ \n\nstarting tests\n\n ]");
+        PDBG(TAG, "test seed %ld", t);
+
+        srand(t);
+
         startClients();
 
         PDBG(TAG, "[ \n\ndone starting clients\n\n ]");
 
+        reconnectSomeClients( 5 % clients.size());
+        reconnectSomeClients( 9 % clients.size());
+        reconnectSomeClients( 17 % clients.size());
+        PDBG(TAG, "[ \n\ndone restarting clients\n\n ]");
+
+        relayTest(10);
+
+        PDBG(TAG, "[ \n\nsecond batch\n\n ]");
+
+        reconnectSomeClients( 17 % clients.size());
         relayTest(10);
 
         stopClients();
@@ -207,6 +224,26 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         PDBG(TAG, "passed all tests")
         ScreenConsole::print("passed all tests");
+    }
+
+    void ClientCreator::reconnectSomeClients(int howMany) {
+        int * c = new int[howMany];
+
+        for(int i=0; i<howMany; ++i)
+            c[i]=rand()%clients.size();
+
+
+        for(int i=0; i<howMany; ++i){
+            clients[c[i]]->stop();
+        }
+        for(int i=0; i<howMany; ++i){
+            clients[c[i]]->start();
+        }
+        for(int i=0; i<howMany; ++i){
+            clients[c[i]]->greet();
+        }
+
+        delete c;
     }
 
 
