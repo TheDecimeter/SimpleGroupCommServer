@@ -7,8 +7,16 @@
 
 
 #include "../../../debug.h"
+#include "Buffer.h"
 #include <cstdint>
-#include <atomic>
+#include <mutex>
+
+
+#define DONE_SENDING 65535
+#define FORGET_ME -2
+#define IN_USE -3
+
+#define BYTES_TO_WRITE 512
 
 namespace com_curiousorigins_simplegroupcommserver {
     class ClientManager;
@@ -20,18 +28,21 @@ namespace com_curiousorigins_simplegroupcommserver {
 #ifdef MEM_TEST
         char MEM_TEST_BLOCK[MEM_TEST_SIZE];
 #endif
-        uint32_t id;
+        uint32_t id, dibs;
         bool deleteSoon;
-        std::atomic<bool> atomicRequested;
-        std::atomic<int> atomicDibbs;
+        std::mutex lock;
+        Buffer * currentBuffer, *lastBuffer;
+        bool addDibb(Buffer * bufferToSend);
 
 
     public:
         int socketID;
         ClientInfo(uint32_t id, int socketID);
-        ClientInfo(ClientInfo &other);
         ClientInfo();
         ~ClientInfo();
+
+        void removeDibb();
+        ssize_t send();
     };
 }
 

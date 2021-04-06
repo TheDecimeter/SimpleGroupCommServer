@@ -21,6 +21,8 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         void resize(size_t dataLen);
         void reset(size_t len);
+        void release();
+        bool isReleased();
         ssize_t fillBuffer(int socketID);
     };
 }

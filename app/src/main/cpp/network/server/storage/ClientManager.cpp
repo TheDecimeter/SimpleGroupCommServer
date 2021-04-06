@@ -81,30 +81,47 @@ namespace com_curiousorigins_simplegroupcommserver {
         std::unordered_map<uint32_t, ClientInfo*>::iterator it;
         it = clients.find(id);
         if(it != clients.end()) {
-//            PDBG(TAG, "found %d", id);
-            delete it->second; //XXX This might need to be changed out for destructor if I swap out for a pre allocated array
-//            PDBG(TAG, "deleted %d", id);
+            ClientInfo * client = it->second;
             clients.erase(it);
-//            PDBG(TAG, "erased %d", id);
+            lock.unlock();
+
+            client->lock.lock();
+            if (client->dibs == 0)
+                delete client;
+            else {
+                client->deleteSoon=true;
+                client->lock.unlock();
+            }
+
+
+
+            return;
         }
         lock.unlock();
     }
 
-    bool ClientManager::tryGet(uint32_t id, ClientInfo ** outSpot){
-        bool r=false;
+    bool ClientManager::tryGet(uint32_t id, ClientInfo ** outSpot, Buffer * buffer){
 //        PDBG(TAG, "tryGet prelock for %d", id);
         lock.lock_shared();
 //        PDBG(TAG, "tryGet postLock for %d", id);
         std::unordered_map<uint32_t,ClientInfo*>::iterator it = clients.find(id);
         if(it != clients.end()){
-            r=true;
-            //new(outSpot) ClientInfo(*(it->second));
-            *outSpot = it->second;
-//            PDBG(TAG, "caching Info at %p, but info is at %p", outSpot, (it->second));
-        }
-        lock.unlock_shared();
+            ClientInfo * client = it->second;
+            lock.unlock_shared(); //unlock the manager so that other items can be removed.
 
-        return r;
+            *outSpot = client;
+            client->lock.lock();  //lock the port, so dibbs can be added, and buffer linked
+
+            if(client->addDibb(buffer)) {
+                client->lock.unlock();
+                return true;
+            }
+            client->lock.unlock();
+            return false;
+        }
+
+        lock.unlock_shared();
+        return false;
     }
 
     bool ClientManager::contains(uint32_t id) {

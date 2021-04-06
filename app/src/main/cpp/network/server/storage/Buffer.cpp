@@ -29,7 +29,17 @@ namespace com_curiousorigins_simplegroupcommserver {
         objLen=len;
     }
 
+
+
     ssize_t Buffer::fillBuffer(int socketID) {
         return read(socketID, readerPosition, bytesToRead);
+    }
+
+    void Buffer::release() {
+        objLen = bytesToRead = 0;
+    }
+
+    bool Buffer::isReleased() {
+        return objLen == 0;
     }
 }

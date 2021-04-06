@@ -29,15 +29,16 @@ namespace com_curiousorigins_simplegroupcommserver {
         Runnable * worker = NULL;
         ClientManager * allClients;
         ClientInfo * infoSpot;
+        Buffer * buffer;
         char reactionType = NO_REACT;
         void process(const char reactionType, Buffer * buffer);
         void relay(Buffer * buffer);
-        void send(Buffer * buffer);
+        void send();
 
     public:
         ClientResponder(ClientManager * allClients);
         void process(Buffer * buffer);
-        bool process();
+        bool continueProcessing();
     };
 
 

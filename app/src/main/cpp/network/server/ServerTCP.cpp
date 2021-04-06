@@ -26,6 +26,7 @@ namespace com_curiousorigins_simplegroupcommserver{
 
     ServerTCP::ServerTCP(const Config * c, ClientCreator * afterCreated):
     config(c){
+        signal(SIGPIPE, SIG_IGN);
 //        PDBG(TAG,"created server")
         stopFlag = true;
         current=new ClientHandler(c, &allClients);

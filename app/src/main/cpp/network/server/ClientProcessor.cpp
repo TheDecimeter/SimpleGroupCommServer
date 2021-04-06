@@ -135,7 +135,7 @@ namespace com_curiousorigins_simplegroupcommserver {
     }
 
     ssize_t ClientProcessor::processResponse() {
-        if(!responder.process())
+        if(!responder.continueProcessing())
             state=ST_READ_LEN;
         return 1;
     }

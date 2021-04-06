@@ -57,7 +57,7 @@ namespace com_curiousorigins_simplegroupcommserver {
      *  again.
      * @return false if no processing needs to be done.
      */
-    bool ClientResponder::process() {
+    bool ClientResponder::continueProcessing() {
 //        if(worker != NULL)
 //            return worker->run() == 0;
 //        return false;
@@ -78,11 +78,11 @@ namespace com_curiousorigins_simplegroupcommserver {
             //PDBG(TAG, "rcv relay to %d : %s", relayTo, ScreenConsole::s(data, l).c_str())
             //ScreenConsole::print({"S rcv: ", ScreenConsole::s(data, l), "\n"});
 
-            if(allClients->tryGet(relayTo, &infoSpot)){
+            if(allClients->tryGet(relayTo, &infoSpot, buffer)){
                 PDBG(TAG, "rcv send size %d to %d at socket %d", buffer->objLen, relayTo, infoSpot->socketID)
-
-                send(buffer);
-
+                buffer->bytesToRead=buffer->objLen;
+                this->buffer=buffer;
+                send();
             }
             else{
                 PDBG(TAG, "can't find referenced client %d", relayTo)
@@ -95,10 +95,16 @@ namespace com_curiousorigins_simplegroupcommserver {
         }
     }
 
-    void ClientResponder::send(Buffer * buffer) {
-        ssize_t bytesWritten = write(infoSpot->socketID,buffer->readerPosition, buffer->objLen);
-        if(bytesWritten != buffer->objLen){
-            PDBG(TAG, "mismatch l: %d, w: %d, e: %d", buffer->objLen, bytesWritten, errno)
+    void ClientResponder::send() {
+//        ssize_t bytesWritten = write(infoSpot->socketID,buffer->readerPosition, buffer->objLen);
+//        if(bytesWritten != buffer->objLen){
+//            PDBG(TAG, "mismatch l: %d, w: %d, e: %d", buffer->objLen, bytesWritten, errno)
+//        }
+        ssize_t written = infoSpot->send();
+
+
+        if(buffer->isReleased()){
+            infoSpot->removeDibb();
         }
     }
 }
