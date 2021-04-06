@@ -58,9 +58,10 @@ namespace com_curiousorigins_simplegroupcommserver {
             delete c;
 
 //        listen=false;
-        processorListLock.lock();
 
         pthread_join(handlerThread, NULL);
+
+        processorListLock.lock();//theoretically, maybe someone could try adding a processor as I am deleting it?
         std::unordered_map<int,ClientProcessor*>::iterator processor;
         for(processor=processors.begin(); processor!=processors.end(); processor++) {
             delete processor->second;
