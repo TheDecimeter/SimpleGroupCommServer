@@ -81,6 +81,7 @@ namespace com_curiousorigins_simplegroupcommserver {
             if(allClients->tryGet(relayTo, &infoSpot, buffer)){
                 PDBG(TAG, "rcv send size %d to %d at socket %d", buffer->objLen, relayTo, infoSpot->socketID)
                 buffer->bytesToRead=buffer->objLen;
+                buffer->next=NULL;
                 this->buffer=buffer;
                 send();
             }

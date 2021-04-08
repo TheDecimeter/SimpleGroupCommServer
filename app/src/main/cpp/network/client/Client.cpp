@@ -58,7 +58,7 @@ namespace com_curiousorigins_simplegroupcommserver {
     }
 
     void Client::stop() {
-        PDBG(TAG, "stopping client %d", clientID);
+        //PDBG(TAG, "stopping client %d", clientID);
         if(connected) {
             close(socketID);
             clientID = -1;
@@ -76,10 +76,10 @@ namespace com_curiousorigins_simplegroupcommserver {
             ssize_t bytesRead;
             unsigned char lenLeft, len;
 //            do {
-                PDBG(TAG, "reading for %d", clientID);
+                //PDBG(TAG, "reading for %d", clientID);
                 bytesRead = read(socketID, &len, 1);
                 if(bytesRead==0){
-                    PDBG(TAG,"should close client, received 0");
+                    //PDBG(TAG,"should close client, received 0");
                     return;
                 }
                 else if(bytesRead<0){
@@ -87,18 +87,18 @@ namespace com_curiousorigins_simplegroupcommserver {
                     return;
                 }
                 else{
-                    PDBG(TAG, "ready to receive object of %d bytes", len);
+                    //PDBG(TAG, "ready to receive object of %d bytes", len);
                 }
                 lenLeft=len;
                 bytesRead = read(socketID, data, lenLeft);
 
                 if(bytesRead == lenLeft){
-                    PDBG(TAG, "finished reading: %d of %d", bytesRead, len)
+                    //PDBG(TAG, "finished reading: %d of %d", bytesRead, len)
                     return;
                 }else if(bytesRead < lenLeft) {
                     PDBG(TAG,"didn't get all bytes %d < %d", bytesRead, len);
                 }else if(bytesRead==0){
-                    PDBG(TAG,"should close client, received 0");
+                    //PDBG(TAG,"should close client, received 0");
                     return;
                 }
                 else if(bytesRead<0){
@@ -166,10 +166,10 @@ namespace com_curiousorigins_simplegroupcommserver {
         if(clientID!=-1)
             return;
         char r[4];
-        PDBG(TAG, "   GREETING")
+        //PDBG(TAG, "   GREETING")
         receive(r);
         clientID=r[0];
-        PDBG(TAG, "greetings from client %d", clientID)
+        //PDBG(TAG, "greetings from client %d", clientID)
     }
 
     int Client::getID() {

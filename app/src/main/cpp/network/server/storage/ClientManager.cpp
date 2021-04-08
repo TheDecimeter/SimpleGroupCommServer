@@ -118,10 +118,10 @@ namespace com_curiousorigins_simplegroupcommserver {
         std::unordered_map<uint32_t,ClientInfo*>::iterator it = clients.find(id);
         if(it != clients.end()){
             ClientInfo * client = it->second;
-            lock.unlock_shared(); //unlock the manager so that other items can be removed.
 
             *outSpot = client;
             client->lock.lock();  //lock the port, so dibbs can be added, and buffer linked
+            lock.unlock_shared(); //unlock the manager so that other items can be added/read/removed.
 
             if(client->addDibb(buffer)) {
                 client->lock.unlock();

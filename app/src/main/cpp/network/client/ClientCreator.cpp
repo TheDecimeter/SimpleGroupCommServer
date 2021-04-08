@@ -96,6 +96,9 @@ namespace com_curiousorigins_simplegroupcommserver {
 
         PDBG(TAG, "[ \n\ndone starting clients\n\n ]");
 
+        relayTest(10);
+        PDBG(TAG, "[ \n\ndone with first relay\n\n ]");
+
         reconnectSomeClients( 5 % clients.size());
         reconnectSomeClients( 9 % clients.size());
         reconnectSomeClients( 17 % clients.size());
@@ -109,6 +112,8 @@ namespace com_curiousorigins_simplegroupcommserver {
         relayTest(10);
 
         stopClients();
+
+        ScreenConsole::print("done with tests");
 
 //int x=4;
 //PDBG(TAG, "x init: %d", x);

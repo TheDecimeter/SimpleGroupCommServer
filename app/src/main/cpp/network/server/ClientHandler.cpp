@@ -28,7 +28,7 @@ namespace com_curiousorigins_simplegroupcommserver {
     ClientHandler::ClientHandler(const Config * c,ClientManager * allClients):
             config(c), active(this), allClients(allClients), name("unsetA"){
         entityCount++;
-        PDBG(TAG,"default constructor %p",this);
+        //PDBG(TAG,"default constructor %p",this);
     }
 
     /**
@@ -44,12 +44,12 @@ namespace com_curiousorigins_simplegroupcommserver {
         for(p=clients->begin(); p != clients->end(); ++p){
             processors.insert(std::pair<int,ClientProcessor*>((*p)->key(), *p));
         }
-        PDBG(TAG,"split constructor %p",this);
+        //PDBG(TAG,"split constructor %p",this);
     }
 
 
     ClientHandler::~ClientHandler(){
-        PDBG(TAG, "start delete %s, %d entities left", name.c_str(), --entityCount)
+        //PDBG(TAG, "start delete %s, %d entities left", name.c_str(), --entityCount)
 
         ClientHandler * c = child;
         child=NULL; // don't try deleting the child from the run thread, deleting it below
@@ -68,7 +68,7 @@ namespace com_curiousorigins_simplegroupcommserver {
         }
         processorListLock.unlock();
 
-        PDBG(TAG, "end delete %s", name.c_str())
+        //PDBG(TAG, "end delete %s", name.c_str())
     }
 
     void *ClientHandler::clientWorkWrapper(void *thiz) {
@@ -84,7 +84,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 
 
         //usleep(5000000);
-        PDBG(TAG,"starting client handler, %s", name.c_str())
+        //PDBG(TAG,"starting client handler, %s", name.c_str())
 
 
         while (listen) {
@@ -118,12 +118,13 @@ namespace com_curiousorigins_simplegroupcommserver {
             pruneDeadChild();
 
             if(dur > 0){//TODO change this back to using timing to see whether too much work on the thread
+
                 if(processors.size() > 4){//dur > longestLoad && processors.size() > 1){
                     PDBG(TAG, "long process time, need to split %s", name.c_str());
                     split();
                 }
                 else {//TODO change this back to using timing to see whether too little work on the thread
-                    if (processors.size() <2 && this != active) { //dur < shortestLoad && this != active) {
+                    if (processors.size() <2 && this != active) {// dur < shortestLoad && this != active) {
                         PDBG(TAG, "workload too light, need to merge %s, this: %p  active: %p", name.c_str(), this, active);
                         mergeWithActive();
                         return;
@@ -131,6 +132,24 @@ namespace com_curiousorigins_simplegroupcommserver {
 
                     std::this_thread::sleep_for(std::chrono::nanoseconds(longestLoad - dur));
                 }
+
+
+
+//                if(/*processors.size() > 4){*/dur > longestLoad && processors.size() > 1){
+//                    PDBG(TAG, "long process time, need to split %s", name.c_str());
+//                    split();
+//                }
+//                else {//TODO change this back to using timing to see whether too little work on the thread
+//                    if (/*processors.size() <2 && this != active) {*/ dur < shortestLoad && this != active) {
+//                        PDBG(TAG, "workload too light, need to merge %s, this: %p  active: %p", name.c_str(), this, active);
+//                        mergeWithActive();
+//                        return;
+//                    }
+//
+//                    std::this_thread::sleep_for(std::chrono::nanoseconds(longestLoad - dur));
+//                }
+
+
             }
             else{
                 std::this_thread::sleep_for(std::chrono::nanoseconds(longestLoad));
@@ -156,7 +175,7 @@ namespace com_curiousorigins_simplegroupcommserver {
 //        PDBG(TAG, "trying to add client %d", connfd)
         if(allClients->add(connfd, outClientID)) {
 
-            PDBG(TAG, "adding client %d to %s", outClientID, name.c_str())
+            //PDBG(TAG, "adding client %d to %s", outClientID, name.c_str())
             ClientProcessor *p = new ClientProcessor(config, connfd, connectionInfo, outClientID,
                                                      allClients);
 
@@ -172,11 +191,11 @@ namespace com_curiousorigins_simplegroupcommserver {
             processorListLock.unlock();
 
             if (!listen) {
-                PDBG(TAG, "Starting listen thread %s", name.c_str());
+                //PDBG(TAG, "Starting listen thread %s", name.c_str());
                 listen = true;
                 pthread_create(&handlerThread, NULL, &clientWorkWrapper, this);
             } else {
-                PDBG(TAG, "listening thread already started %s", name.c_str());
+                //PDBG(TAG, "listening thread already started %s", name.c_str());
             }
         }
     }
@@ -246,7 +265,7 @@ namespace com_curiousorigins_simplegroupcommserver {
             ClientHandler * newChild = new ClientHandler(config, active, &kids, allClients);
 
             if(newChild->processors.size() > 0) {
-                newChild->name = std::to_string(entityCount)+" "+name + std::to_string(++childCount);
+                newChild->name = name + std::to_string(++childCount);
                 PDBG(TAG, "%s created new child: %s", name.c_str(), newChild->name.c_str());
 
                 newChild->child = child;
@@ -295,6 +314,8 @@ namespace com_curiousorigins_simplegroupcommserver {
      */
     void ClientHandler::pruneDeadChild() {
         if(child!=NULL && child->stop){
+            //PDBG(TAG, "%p is pruning %p", this,child);
+            //PDBG(TAG, "%s at %p on %d pruning %s at %p", name.c_str(), this, handlerThread, child->name.c_str(), child)
             ClientHandler *newChild=child->child;
             child->child=NULL;
             delete child;

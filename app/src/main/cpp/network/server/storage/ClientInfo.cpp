@@ -8,7 +8,7 @@
 #define TAG "ClientInfoCpp"
 namespace com_curiousorigins_simplegroupcommserver {
     ClientInfo::ClientInfo(uint32_t id, int socketID):
-    id(id), socketID(socketID), dibs(0), deleteSoon(false){
+    id(id), socketID(socketID), dibs(0), deleteSoon(false), currentBuffer(NULL), lastBuffer(NULL){
 //        PDBG(TAG, "           creating defined at %p", this)
     }
 
@@ -34,7 +34,7 @@ namespace com_curiousorigins_simplegroupcommserver {
             lastBuffer->next = bufferToSend;
 
         lastBuffer=bufferToSend;
-        lastBuffer->next=NULL;
+        //lastBuffer->next=NULL;
 
         dibs++;
         return true;
